@@ -47,7 +47,7 @@ export default function AddChant({ onClose, onAdded, user }) {
         ...form,
         categories: form.categories.split(",").map(c => c.trim())
       };
-      await api.post("/chants", data, { headers: { Authorization: `Bearer ${token}` } });
+      await api.post("/api/chants", data, { headers: { Authorization: `Bearer ${token}` } });
       
       
       onAdded();
