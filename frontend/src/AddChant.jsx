@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
-
-const api = axios.create({ baseURL: "http://localhost:5000/api" });
+const apiUrl = import.meta.env.VITE_API_URL;
+const api = axios.create({ baseURL: apiUrl});
 
 export default function AddChant({ onClose, onAdded, user }) {
   const [form, setForm] = useState({
@@ -45,8 +45,7 @@ export default function AddChant({ onClose, onAdded, user }) {
       const token = localStorage.getItem("token");
       const data = {
         ...form,
-        categories: form.categories.split(",").map(c => c.trim()),
-        ajoute_par: user._id
+        categories: form.categories.split(",").map(c => c.trim())
       };
       await api.post("/chants", data, { headers: { Authorization: `Bearer ${token}` } });
       

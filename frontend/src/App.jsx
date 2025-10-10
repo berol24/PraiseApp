@@ -3,8 +3,8 @@ import axios from "axios";
 import Login from "./Login";
 import Register from "./Register";
 import AddChant from "./AddChant";
-
-const api = axios.create({ baseURL: "http://localhost:5000/api" });
+const apiUrl = import.meta.env.VITE_API_URL;
+const api = axios.create({ baseURL: apiUrl });
 
 export default function App() {
   const [user, setUser] = useState(null);
