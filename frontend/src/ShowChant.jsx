@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AddChant from "./AddChant";
 import { Link, useNavigate } from "react-router-dom";
-import logo_PraiseApp from "./assets/logo_PraiseApp.png";
+import logo_PraiseApp from "./assets/logo_praiseApp.png";
 const apiUrl = import.meta.env.VITE_API_URL;
 const api = axios.create({ baseURL: apiUrl });
 

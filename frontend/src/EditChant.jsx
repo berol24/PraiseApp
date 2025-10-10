@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {  useParams,useNavigate } from "react-router-dom";
 import axios from "axios";
-import logo_PraiseApp from "./assets/logo_PraiseApp.png";
+import logo_PraiseApp from "./assets/logo_praiseApp.png";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 const api = axios.create({ baseURL: apiUrl });
