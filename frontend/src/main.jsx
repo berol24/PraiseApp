@@ -13,6 +13,8 @@ import Home from "./Home";
 import Login from "./Login";
 import Register from "./Register";
 import ShowChant from "./ShowChant";
+import ShowDetailChant from "./ShowDetailChant";
+import EditChant from "./EditChant";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -21,6 +23,8 @@ const router = createBrowserRouter(
       <Route path="login" element={<Login />} />
       <Route path="register" element={<Register />} />
       <Route path="showChants" element={<ShowChant />} />
+      <Route path="showChants/:Idchant" element={<ShowDetailChant />} />
+      <Route path="editChant/:Idchant" element={<EditChant />} />
     </Route>
   )
 );
