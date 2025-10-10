@@ -13,17 +13,35 @@ export default function App() {
   const [showAddForm, setShowAddForm] = useState(false);
 
   const fetchChants = async () => {
-    const res = await api.get("/api/chants");
-    setChants(res.data);
+ try {
+      const res = await api.get("/chants");
+      setChants(res.data);
+    } catch (err) {
+      console.error("Erreur lors du chargement des chants", err);
+    }
   };
 
-  useEffect(() => { fetchChants(); }, []);
+  // useEffect(() => { fetchChants(); }, []);
+  useEffect(() => {
+  // Restaurer l'utilisateur depuis localStorage s'il existe
+  const storedUser = localStorage.getItem("user");
+  if (storedUser) {
+    setUser(JSON.parse(storedUser));
+  }
+  fetchChants();
+}, []);
 
+
+ const handleLogin = (userData) => {
+    localStorage.setItem("user", JSON.stringify(userData));
+    setUser(userData);
+  };
+  
   if (!user) {
     return showRegister ? (
       <Register onRegister={setUser} switchToLogin={() => setShowRegister(false)} />
     ) : (
-      <Login onLogin={setUser} switchToRegister={() => setShowRegister(true)} />
+      <Login onLogin={handleLogin} switchToRegister={() => setShowRegister(true)} />
     );
   }
 

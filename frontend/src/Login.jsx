@@ -13,8 +13,9 @@ export default function Login({ onLogin, switchToRegister }) {
     e.preventDefault();
     setError("");
     try {
-      const res = await api.post("/api/login", form);
+      const res = await api.post("/login", form);
       localStorage.setItem("token", res.data.token);
+       localStorage.setItem("user", JSON.stringify(res.data.user));
       onLogin(res.data.user);
     } catch (err) {
       setError(err.response?.data?.message || "Erreur login");
