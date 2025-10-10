@@ -9,7 +9,10 @@ import { User, Chant } from "./models.js";
 dotenv.config();
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: "*", // ou "*" si tu veux autoriser tout le monde
+  credentials: true
+}));
 
 // === Connexion MongoDB ===
 mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/chantdb", {
