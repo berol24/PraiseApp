@@ -14,7 +14,7 @@ export default function App() {
 
   const fetchChants = async () => {
  try {
-      const res = await api.get("/chants");
+      const res = await api.get("/api/chants");
       setChants(res.data);
     } catch (err) {
       console.error("Erreur lors du chargement des chants", err);
