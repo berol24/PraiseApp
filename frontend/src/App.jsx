@@ -13,7 +13,7 @@ export default function App() {
   const [showAddForm, setShowAddForm] = useState(false);
 
   const fetchChants = async () => {
-    const res = await api.get("/chants");
+    const res = await api.get("/api/chants");
     setChants(res.data);
   };
 

@@ -13,9 +13,9 @@ export default function Register({ onRegister, switchToLogin }) {
     e.preventDefault();
     setError("");
     try {
-      await api.post("/register", form);
+      await api.post("/api/register", form);
       // Auto-login après inscription
-      const loginRes = await api.post("/login", { email: form.email, mot_de_passe: form.mot_de_passe });
+      const loginRes = await api.post("/api/login", { email: form.email, mot_de_passe: form.mot_de_passe });
       localStorage.setItem("token", loginRes.data.token);
       onRegister(loginRes.data.user);
     } catch (err) {

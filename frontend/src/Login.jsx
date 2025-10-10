@@ -13,7 +13,7 @@ export default function Login({ onLogin, switchToRegister }) {
     e.preventDefault();
     setError("");
     try {
-      const res = await api.post("/login", form);
+      const res = await api.post("/api/login", form);
       localStorage.setItem("token", res.data.token);
       onLogin(res.data.user);
     } catch (err) {
