@@ -21,7 +21,7 @@ export default function Login() {
 
       if (!res.ok) throw new Error("Email ou mot de passe incorrect");
       const data = await res.json();
-
+      localStorage.setItem("token", data.token); 
       localStorage.setItem("user", JSON.stringify(data.user));
       navigate("/showChants");
     } catch (err) {
