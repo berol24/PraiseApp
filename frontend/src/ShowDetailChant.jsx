@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { formatDate } from "./utils/FormatDate";
-import { handleDownloadPDF } from "./utils/handleDownloadPDF";
+import { formatDate } from "./utils/FormatDate.jsx";
+import { handleDownloadPDF } from "./utils/handleDownloadPDF.jsx";
 const apiUrl = import.meta.env.VITE_API_URL;
 function ShowDetailChant() {
   const Idchant = useParams().Idchant;
