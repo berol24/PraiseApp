@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User, Chant } from "./models.js";
+import { authMiddleware } from './authMiddleware.js';
 
 dotenv.config();
 const app = express();
@@ -22,21 +23,6 @@ mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/chantdb", {
 .then(() => console.log("✅ Connecté à MongoDB"))
 .catch(err => console.error("❌ Erreur MongoDB :", err));
 
-// === Middleware Auth ===
-const authMiddleware = (roles = []) => (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "Token manquant" });
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "secret");
-    if (roles.length && !roles.includes(decoded.role))
-      return res.status(403).json({ message: "Accès refusé" });
-    req.user = decoded;
-    next();
-  } catch {
-    res.status(401).json({ message: "Token invalide" });
-  }
-};
 
 // === Routes Utilisateur ===
 app.post("/api/register", async (req, res) => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import {  useParams,useNavigate } from "react-router-dom";
 import axios from "axios";
 import logo_PraiseApp from "./assets/logo_praiseApp.png";
@@ -111,7 +111,6 @@ export default function EditChant() {
       setLoading(false);
     }
   };
-
 
     const handleLogout = () => {
     localStorage.removeItem("user");
