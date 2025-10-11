@@ -1,3 +1,7 @@
+import axios from "axios";
+const apiUrl = import.meta.env.VITE_API_URL;
+const api = axios.create({ baseURL: apiUrl });
+
 export  const handleDelete = async (id) => {
     if (!window.confirm("Voulez-vous vraiment supprimer ce chant ?")) return;
 
