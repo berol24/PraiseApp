@@ -21,7 +21,7 @@ export default function ShowChant() {
     fetchChants();
   }, []);
 
-  const fetchChants = async () => {
+   const fetchChants = async () => {
     try {
       const res = await api.get("/api/chants");
       setChants(res.data);
@@ -111,7 +111,11 @@ export default function ShowChant() {
                     </Link>
 
                     <button
-                      onClick={() => handleDelete(c._id)}
+                      onClick={(e) => {
+                        e.preventDefault(); 
+                        e.stopPropagation(); 
+                        handleDelete(c._id, navigate,fetchChants);
+                      }}
                       className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition"
                     >
                       Supprimer

@@ -190,7 +190,7 @@ export default function EditChant() {
                   updatePart(index, "numero", parseInt(e.target.value) || 1)
                 }
               />
-              <input
+              <textarea
                 type="text"
                 placeholder="Contenu"
                 className="border p-2 rounded-lg w-full sm:w-2/3"

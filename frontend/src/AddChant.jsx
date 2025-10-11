@@ -128,7 +128,7 @@ export default function AddChant({ onClose, onAdded }) {
                   }
                 />
 
-                <input
+                <textarea
                   type="text"
                   placeholder="Contenu"
                   className="border p-2 rounded-lg w-full sm:w-2/3"
