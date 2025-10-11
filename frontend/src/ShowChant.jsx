@@ -11,7 +11,8 @@ export default function ShowChant() {
   const [chants, setChants] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const navigate = useNavigate();
-
+  console.log("user:", user);
+  
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (!storedUser) return navigate("/login");
@@ -145,36 +146,43 @@ export default function ShowChant() {
 //       </div>
 //     </div>
 
+
 <div className="min-h-screen bg-gray-50">
-  {/* Header */}
-  <header className="bg-white shadow-md top-0 left-0 position-sticky z-10">
-    <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between p-4">
-      {/* Logo */}
-      <div className="flex items-center mb-3 sm:mb-0">
+
+<header className="bg-white shadow-md sticky top-0 z-10">
+  <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between p-4 gap-4">
+    
+    <div className="flex items-center justify-between w-full sm:w-auto">
+      <div className="flex items-center">
         <img
-          src={logo_PraiseApp} // Chemin vers votre logo
+          src={logo_PraiseApp}
           alt="logo_PraiseApp"
-          className="h-20 w-20 mr-3"
+          className="h-16 w-16 mr-3 object-contain"
         />
-        {/* Petit écran - titre à côté */}
-        <h1 className="text-2xl font-bold text-gray-700 sm:hidden">
+        <h1 className="text-xl font-bold text-gray-700 sm:hidden">
           Liste des Chants
         </h1>
       </div>
-      {/* Titre central sur écrans moyens et plus */}
-      <h1 className="hidden sm:block text-3xl font-bold text-center text-gray-700 flex-grow">
-        Liste des Chants
-      </h1>
-
-      {/* Bouton déconnexion */}
-      <button
-        onClick={handleLogout}
-        className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-lg transition w-full sm:w-auto mt-3 sm:mt-0"
-      >
-        Déconnexion
-      </button>
     </div>
-  </header>
+
+
+    <h1 className="hidden sm:block text-2xl md:text-3xl font-bold text-gray-700 text-center flex-1">
+      Liste des Chants
+    </h1>
+
+    <div className="flex items-center justify-center border-2 border-gray-600 rounded-full w-12 h-12 sm:mx-6">
+      <span className="text-lg font-bold text-gray-700"> {user?.nom[0]}</span>
+    </div>
+
+    <button
+      onClick={handleLogout}
+      className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-5 rounded-lg transition w-full sm:w-auto"
+    >
+      Déconnexion
+    </button>
+  </div>
+</header>
+
 
   {/* Contenu principal */}
   <main className="container mx-auto p-6 sm:p-8 md:p-10 max-w-6xl">
