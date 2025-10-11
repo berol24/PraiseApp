@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { formatDate } from "./utils/FormatDate.jsx";
-import { handleDownloadPDF } from "./utils/handleDownloadPDF.jsx";
+import { formatDate } from "./utils/FormatDate";
+import { handleDownloadPDF } from "./utils/handleDownloadPDF";
 const apiUrl = import.meta.env.VITE_API_URL;
 function ShowDetailChant() {
   const Idchant = useParams().Idchant;
@@ -151,7 +151,7 @@ function ShowDetailChant() {
           {/* --- BOUTON GLOBAL --- */}
           <li className="pt-3 border-t border-gray-300 flex  items-center gap-3">
             <button
-              onClick={()=>handleDownloadPDF(mesChants,sortedStructure)}
+              onClick={()=>handleDownloadPDF (mesChants,sortedStructure)}
               className="flex-1 sm:flex-none bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition text-sm flex items-center justify-center"
             >
               Télécharger les paroles en PDF
