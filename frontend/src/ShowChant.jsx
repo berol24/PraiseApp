@@ -73,7 +73,7 @@ export default function ShowChant() {
           </div>
 
           <button
-            onClick={handleLogout}
+            onClick={()=>handleLogout(navigate)}
             className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-5 rounded-lg transition w-full sm:w-auto"
           >
             Déconnexion

@@ -28,5 +28,5 @@ export default function App() {
     navigate("/login");
   };
 
-  return <Outlet context={{ user, handleLogin, handleLogout }} />;
+  return <Outlet context={{ user, handleLogin,handleLogout  }} />;
 }
