@@ -2,16 +2,19 @@
 
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import icon_loading from "./assets/icon_loading.png";
 
 export default function Login() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", mot_de_passe: "" });
   const [error, setError] = useState("");
+  const[loading, setLoading] = useState(false);
   const apiUrl = import.meta.env.VITE_API_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
     try {
       const res = await fetch(`${apiUrl}/api/login`, {
         method: "POST",
@@ -53,9 +56,10 @@ export default function Login() {
             required
             className="border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
-          <button className="bg-blue-500 text-white font-semibold py-3 rounded hover:bg-blue-600 transition">
-            Se connecter
-          </button>
+          {/* <button className="flex bg-blue-500 text-white font-semibold py-3 rounded hover:bg-blue-600 transition"> */}
+            <button className="flex items-center justify-center gap-2 bg-blue-500 text-white font-semibold py-3 px-4 rounded cursor-pointer hover:bg-blue-600 transition">
+            Se connecter{ loading && <img className="w-5 h-5 animate-spin" src={icon_loading} alt="Chargement..." />}
+          </button> 
         </form>
         <p className="mt-4 text-center text-gray-600 text-sm">
           Pas de compte ?{" "}
