@@ -36,33 +36,33 @@ function ShowDetailChant() {
   return (
     <div className="max-w-4xl mx-auto p-8 bg-white rounded-xl shadow-lg mt-12">
       <h1 className="text-4xl font-extrabold text-gray-900 mb-6">
-        Titre : {mesChants.titre}
+        Titre : {mesChants.titre || "Pas spécifique"}
       </h1>
 
       <div className="mb-4 text-gray-700">
         <p>
-          <span className="font-semibold">Auteur :</span> {mesChants.auteur}
+          <span className="font-semibold">Auteur :</span> {mesChants.auteur || "Pas spécifique"}
         </p>
         <p>
-          <span className="font-semibold">Langue :</span> {mesChants.langue}
+          <span className="font-semibold">Langue :</span> {mesChants.langue || "Pas spécifique"}
         </p>
         <p>
-          <span className="font-semibold">Rythme :</span> {mesChants.rythme}
+          <span className="font-semibold">Rythme :</span> {mesChants.rythme || "Pas spécifique"}
         </p>
         <p>
           <span className="font-semibold">Catégories :</span>{" "}
-          {mesChants.categories.join(", ")}
+          {mesChants.categories.join(", ") || "Pas spécifique"}
         </p>
       </div>
 
       <div className="mb-6 text-gray-600">
         <p>
           <span className="font-semibold">Date de création :</span>{" "}
-          {formatDate(mesChants.date_creation)}
+          {formatDate(mesChants.date_creation) || "Pas spécifique"}
         </p>
         <p>
           <span className="font-semibold">Mise à jour :</span>{" "}
-          {formatDate(mesChants.date_mise_a_jour)}
+          {formatDate(mesChants.date_mise_a_jour) || "Pas spécifique"}
         </p>
       </div>
 

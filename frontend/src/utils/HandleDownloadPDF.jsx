@@ -47,7 +47,7 @@ import { jsPDF } from "jspdf";
     doc.setFont("helvetica", "bold");
     doc.text("Catégories :", margin, y);
     doc.setFont("helvetica", "normal");
-    doc.text(mesChants.categories.join(", ") || "—", margin + 30, y);
+    doc.text(mesChants.categories.join(", ") || "Pas spécifié", margin + 30, y);
     y += 15;
 
     //  Ligne de séparation avant les paroles
