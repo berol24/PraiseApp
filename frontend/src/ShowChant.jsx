@@ -3,7 +3,6 @@ import axios from "axios";
 import AddChant from "./AddChant";
 import { Link, useNavigate } from "react-router-dom";
 import { handleDelete } from "./services/HandleDelete";
-import { handleLogout } from "./services/HandleLogout";
 import Header from "./components/Header";
 const apiUrl = import.meta.env.VITE_API_URL;
 const api = axios.create({ baseURL: apiUrl });
@@ -46,40 +45,7 @@ export default function ShowChant() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* <header className="bg-white shadow-md sticky top-0 z-10">
-        <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between p-4 gap-4">
-          <div className="flex items-center justify-between w-full sm:w-auto">
-            <div className="flex items-center">
-              <img
-                src={logo_PraiseApp}
-                alt="logo_PraiseApp"
-                className="h-16 w-16 mr-3 object-contain"
-              />
-              <h1 className="text-xl font-bold text-gray-700 sm:hidden">
-                Liste des Chants
-              </h1>
-            </div>
-          </div>
-
-          <h1 className="hidden sm:block text-2xl md:text-3xl font-bold text-gray-700 text-center flex-1">
-            Liste des Chants
-          </h1>
-
-          <div className="flex items-center justify-center border-2 border-gray-600 rounded-full w-12 h-12 sm:mx-6">
-            <span className="text-lg font-bold text-gray-700">
-              {" "}
-              {user?.nom[0]}
-            </span>
-          </div>
-
-          <button
-            onClick={()=>handleLogout(navigate)}
-            className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-5 rounded-lg transition w-full sm:w-auto"
-          >
-            Déconnexion
-          </button>
-        </div>
-      </header> */}
+    
      <Header navigate={navigate} user={user} />
       {/* Contenu principal */}
       <main className="container mx-auto p-6 sm:p-8 md:p-10 max-w-6xl">
@@ -93,7 +59,7 @@ export default function ShowChant() {
     className="w-full sm:w-64 border border-gray-400 rounded-lg py-2 px-3 text-base text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
   />
         {/* Bouton Ajouter pour admin */}
-        {user?.role === "admin" || user?.role === "manager" && (
+        {(user?.role === "admin" || user?.role === "manager") && (
           // <div className="flex justify-end mb-6">
             <button
               onClick={() => setShowAddForm(true)}
@@ -124,7 +90,7 @@ export default function ShowChant() {
                   Auteur : {c.auteur || "Inconnu"}
                 </p>
 
-                {user?.role === "admin" || user?.role === "manager" && (
+                {(user?.role === "admin" || user?.role === "manager") && (
                   <div className="flex space-x-4">
                     <Link
                       to={`/editChant/${c._id}`}

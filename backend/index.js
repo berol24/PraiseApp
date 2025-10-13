@@ -57,6 +57,24 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
+// === Routes Users ===
+app.get("/api/users", async (_, res) => {
+  const users = await User.find();
+  console.log(users);
+  
+  res.json(users);
+});
+
+
+app.delete("/api/users/:id", authMiddleware(["admin"]), async (req, res) => {
+  await User.findByIdAndDelete(req.params.id);
+  console.log("utilisateur supprimé",req.params.id );
+  
+  res.json({ message: "Chant supprimé" });
+});
+
+
+
 // === Routes Chants ===
 app.get("/api/chants", async (_, res) => {
   const chants = await Chant.find().populate("ajoute_par", "nom email");
