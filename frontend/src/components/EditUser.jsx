@@ -30,7 +30,7 @@ function EditUser() {
         setForm({
           nom: data.nom || "",
           email: data.email || "",
-          mot_de_passe: data.mot_de_passe || "",
+          mot_de_passe:"",
           role: data.role || "",
         });
 
@@ -53,8 +53,19 @@ function EditUser() {
 
     try {
       const token = localStorage.getItem("token");
+      console.log("Token utilisé:", token);
 
-      await api.put(`/api/users/${IdUser}`, form, {
+      // On prépare le payload à envoyer
+      const payload = {
+        nom: form.nom,
+        email: form.email,
+        role: form.role,
+      };
+      // On n'ajoute mot_de_passe que si non vide
+      if (form.mot_de_passe && form.mot_de_passe.trim().length > 0) {
+        payload.mot_de_passe = form.mot_de_passe;
+      }
+      await api.put(`/api/users/${IdUser}`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -127,18 +138,19 @@ function EditUser() {
                 <input
                   id="password"
                   type="password"
-                  name="password"
+                  name="mot_de_passe"
+                  value={form.mot_de_passe}
                   onChange={(e) =>
                     setForm({ ...form, mot_de_passe: e.target.value })
                   }
-                  autoComplete="password"
+                  autoComplete="new-password"
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 />
               </div>
             </div>
             <div className="sm:col-span-4">
               <label
-                htmlFor="password"
+                htmlFor="role"
                 className="block text-sm/6 font-medium text-gray-900"
               >
                 Rôle

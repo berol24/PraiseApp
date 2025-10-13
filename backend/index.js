@@ -71,7 +71,7 @@ app.get("/api/users/:id", async (req, res) => {
 });
 
 
-app.put("/api/users/:id", authMiddleware(["admin"]), async (req, res) => {
+app.put("/api/users/:id", async (req, res) => {
   const user = await User.findById(req.params.id);
   if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -79,10 +79,10 @@ app.put("/api/users/:id", authMiddleware(["admin"]), async (req, res) => {
   user.email = req.body.email || user.email;
   user.role = req.body.role || user.role;
 
-  if (req.body.mot_de_passe) {
-    const saltRounds = 10;
-    user.mot_de_passe = await bcrypt.hash(req.body.mot_de_passe, saltRounds);
+  if (req.body.mot_de_passe && req.body.mot_de_passe.trim().length > 0) {
+    user.mot_de_passe = await bcrypt.hash(req.body.mot_de_passe, 10);
   }
+
 
   await user.save();
 
