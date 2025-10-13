@@ -10,10 +10,28 @@ import { authMiddleware } from './authMiddleware.js';
 dotenv.config();
 const app = express();
 app.use(express.json());
+// app.use(cors({
+//   origin: "*", 
+//   credentials: true
+// }));
+
+const allowedOrigins = [
+  "https://praiseapp.pages.dev",  
+  "http://localhost:5173",      
+];
+
 app.use(cors({
-  origin: "*", // ou "*" si tu veux autoriser tout le monde
-  credentials: true
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);  
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
 }));
+
 
 // === Connexion MongoDB ===
 mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/chantdb", {
