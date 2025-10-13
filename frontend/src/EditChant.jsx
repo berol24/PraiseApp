@@ -2,6 +2,7 @@ import  { useState, useEffect } from "react";
 import {  useParams,useNavigate } from "react-router-dom";
 import axios from "axios";
 import logo_PraiseApp from "./assets/logo_praiseApp.png";
+import { handleLogout } from "./services/HandleLogout";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 const api = axios.create({ baseURL: apiUrl });
@@ -112,10 +113,6 @@ export default function EditChant() {
     }
   };
 
-    const handleLogout = () => {
-    localStorage.removeItem("user");
-    navigate("/login");
-  };
   return (<>
       <header className="bg-white shadow-md top-0 left-0 position-sticky z-10">
         <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between p-4">
@@ -137,7 +134,7 @@ export default function EditChant() {
     
           {/* Bouton déconnexion */}
           <button
-            onClick={handleLogout}
+             onClick={()=>handleLogout(navigate)}
             className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-lg transition w-full sm:w-auto mt-3 sm:mt-0"
           >
             Déconnexion
