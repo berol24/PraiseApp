@@ -15,6 +15,7 @@ import Register from "./Register";
 import ShowChant from "./ShowChant";
 import ShowDetailChant from "./ShowDetailChant";
 import EditChant from "./EditChant";
+import AdminPage from "./components/AdminPage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -25,6 +26,7 @@ const router = createBrowserRouter(
       <Route path="showChants" element={<ShowChant />} />
       <Route path="showChants/:Idchant" element={<ShowDetailChant />} />
       <Route path="editChant/:Idchant" element={<EditChant />} />
+      <Route path="admin" element={<AdminPage />} />
     </Route>
   )
 );

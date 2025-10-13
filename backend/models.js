@@ -5,7 +5,7 @@ const UserSchema = new mongoose.Schema({
   nom: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   mot_de_passe: { type: String, required: true },
-  role: { type: String, enum: ["admin", "client"], default: "client" },
+  role: { type: String, enum: ["admin","manager" ,"client"], default: "client" },
   date_inscription: { type: Date, default: Date.now }
 });
 export const User = mongoose.model("User", UserSchema);
