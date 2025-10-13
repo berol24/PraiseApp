@@ -11,7 +11,7 @@ function AdminPage() {
   const [user, setUser] = useState(null);
   const [myUsers,setMyUsers] = useState([])
   const navigate = useNavigate();
-  console.log(user);
+  // console.log(user);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");

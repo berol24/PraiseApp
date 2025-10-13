@@ -70,6 +70,26 @@ app.get("/api/users/:id", async (req, res) => {
   res.json(user);
 });
 
+
+app.put("/api/users/:id", authMiddleware(["admin"]), async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  user.nom = req.body.nom || user.nom;
+  user.email = req.body.email || user.email;
+  user.role = req.body.role || user.role;
+
+  if (req.body.mot_de_passe) {
+    const saltRounds = 10;
+    user.mot_de_passe = await bcrypt.hash(req.body.mot_de_passe, saltRounds);
+  }
+
+  await user.save();
+
+  res.json(user);
+});
+
+
 app.delete("/api/users/:id", authMiddleware(["admin"]), async (req, res) => {
   await User.findByIdAndDelete(req.params.id);
   console.log("utilisateur supprimé",req.params.id );
