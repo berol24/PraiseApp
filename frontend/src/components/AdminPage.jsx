@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Header from './Header';
 import axios from "axios";
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { formatDate } from '../utils/FormatDate';
 import { handleDeleteUser } from '../services/HandleDeleteUser';
 
@@ -105,8 +105,12 @@ function AdminPage() {
         </td>
         <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
           <div className="flex justify-end space-x-2">
-            <button className="text-blue-600 hover:text-blue-900 p-1">Modifier</button>
-            <button className="text-red-600 hover:text-red-900 p-1"
+                  <Link
+                      to={`/editUser/${u._id}`}
+                      className="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 px-4 rounded-lg transition"
+                    >
+                      modifier
+                    </Link>            <button className="text-red-600 bg-red-600 text-white rounded-lg hover:text-red-900 p-1"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();

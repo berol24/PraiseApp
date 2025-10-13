@@ -60,11 +60,15 @@ app.post("/api/login", async (req, res) => {
 // === Routes Users ===
 app.get("/api/users", async (_, res) => {
   const users = await User.find();
-  console.log(users);
-  
   res.json(users);
 });
 
+
+app.get("/api/users/:id", async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user) return res.status(404).json({ message: "Utilisateur  introuvable" });
+  res.json(user);
+});
 
 app.delete("/api/users/:id", authMiddleware(["admin"]), async (req, res) => {
   await User.findByIdAndDelete(req.params.id);
