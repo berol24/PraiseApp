@@ -61,10 +61,10 @@ function AdminPage() {
     <th className="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
       N°
     </th>
-    <th className="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider hidden md:table-cell">
+    <th className="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider ">
       Nom
     </th>
-    <th className="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider hidden md:table-cell">
+    <th className="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider ">
       Email
     </th>
     <th className="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
@@ -91,10 +91,10 @@ function AdminPage() {
             </div>
           </div>
         </td>
-        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
+        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 ">
           <div>{u.nom}</div>
         </td>
-        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
+        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 ">
           <div>{u.email}</div>
         </td>
         <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
