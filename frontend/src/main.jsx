@@ -17,6 +17,7 @@ import ShowDetailChant from "./pages/ShowDetailChant";
 import EditChant from "./pages/EditChant";
 import AdminPage from "./components/AdminPage";
 import EditUser from "./components/EditUser";
+import Favoris from "./pages/Favoris";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -29,6 +30,8 @@ const router = createBrowserRouter(
       <Route path="editChant/:Idchant" element={<EditChant />} />
       <Route path="admin" element={<AdminPage />} />
       <Route path="editUser/:IdUser" element={<EditUser />} />
+      <Route path="favoris" element={<Favoris />} />
+      <Route path="*" element={<div>404 Not Found</div>} />
     </Route>
   )
 );

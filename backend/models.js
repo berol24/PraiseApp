@@ -6,7 +6,8 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   mot_de_passe: { type: String, required: true },
   role: { type: String, enum: ["admin","manager" ,"client"], default: "client" },
-  date_inscription: { type: Date, default: Date.now }
+  date_inscription: { type: Date, default: Date.now },
+  favoris: [{ type: mongoose.Schema.Types.ObjectId, ref: "Chant" }]
 });
 export const User = mongoose.model("User", UserSchema);
 

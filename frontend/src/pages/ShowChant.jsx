@@ -13,6 +13,8 @@ export default function ShowChant() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredChants, setFilteredChants] = useState([]);
+  const [favoris, setFavoris] = useState([]); // liste locale des favoris
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -42,9 +44,57 @@ export default function ShowChant() {
     setFilteredChants(filtered);
   }, [searchTerm, chants]);
 
+  useEffect(() => {
+    fetchFavoris();
+  }, [user]);
+
+  const fetchFavoris = async () => {
+    if (!user) return;
+    try {
+      const res = await api.get("/favoris", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      setFavoris(res.data);
+    } catch (err) {
+      console.error("Erreur lors du chargement des favoris", err);
+    }
+  };
+
+  //  Ajouter ou retirer un favori
+  const handleFavori = async (chantId, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    try {
+      const res = await api.post(
+        `/api/favoris/${chantId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      fetchFavoris();
+    } catch (err) {
+      console.error("Erreur favoris :", err);
+    }
+  };
+
+  // Vérifier si un chant est en favoris
+  const isFavori = (chantId) => favoris.some((f) => f._id === chantId);
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header navigate={navigate} user={user} number_chants={filteredChants.length} />
+      <Header
+        navigate={navigate}
+        user={user}
+        number_chants={filteredChants.length}
+      />
       {/* Contenu principal */}
       <main className="container mx-auto p-6 sm:p-8 md:p-10 max-w-6xl">
         <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
@@ -58,7 +108,6 @@ export default function ShowChant() {
           />
           {/* Bouton Ajouter pour admin */}
           {(user?.role === "admin" || user?.role === "manager") && (
-            // <div className="flex justify-end mb-6">
             <button
               onClick={() => setShowAddForm(true)}
               className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-5 rounded-lg transition w-full sm:w-auto"
@@ -82,12 +131,31 @@ export default function ShowChant() {
             filteredChants.map((c) => (
               <a href={`/showChants/${c._id}`} key={c._id} className="block">
                 <div className="bg-white shadow-lg rounded-2xl p-5 flex flex-col justify-between cursor-pointer hover:shadow-xl transition">
-                  <h3 className="font-bold text-xl text-gray-800 mb-2">
-                    {c.titre}
-                  </h3>
-                  <p className="text-gray-500 italic mb-4">
-                    Auteur : {c.auteur || "Inconnu"}
-                  </p>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-bold text-xl text-gray-800 mb-2">
+                        {c.titre}
+                      </h3>
+                      <p className="text-gray-500 italic mb-4">
+                        Auteur : {c.auteur || "Inconnu"}
+                      </p>
+                    </div>
+
+                    {/* ⭐ Bouton Favori */}
+                    {user && (
+                      <button
+                        onClick={(e) => handleFavori(c._id, e)}
+                        className="text-yellow-500 hover:text-yellow-600 text-2xl transition"
+                        title={
+                          isFavori(c._id)
+                            ? "Retirer des favoris"
+                            : "Ajouter aux favoris"
+                        }
+                      >
+                        {isFavori(c._id) ? "★" : "☆"}
+                      </button>
+                    )}
+                  </div>
 
                   {(user?.role === "admin" || user?.role === "manager") && (
                     <div className="flex space-x-4">

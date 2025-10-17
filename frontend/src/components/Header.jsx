@@ -3,6 +3,8 @@ import logo_PraiseApp from "../assets/logo_praiseApp.png";
 import { Link } from "react-router-dom";
 
 function Header({navigate,user ,number_chants}) {
+  console.log("number_chants dans header",number_chants);
+  
   return (
        <header className="bg-white shadow-md sticky top-0 z-10">
         <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between p-4 gap-4">
@@ -14,14 +16,17 @@ function Header({navigate,user ,number_chants}) {
                 className="h-16 w-16 mr-3 object-contain"
               /></Link>
               <h1 className="text-xl font-bold text-gray-700 sm:hidden">
-                Liste des Chants ({number_chants}) 
+                Liste des Chants  {number_chants ? 'number_chants' : ""}
               </h1>
             </div>
           </div>
 
           <h1 className="hidden sm:block text-2xl md:text-3xl font-bold text-gray-700 text-center flex-1">
-            Liste des Chants ({number_chants}) 
+            Liste des Chants {number_chants ? (number_chants) : ""}
           </h1>
+          <Link to={"/favoris"} className="flex items-center justify-center text-lg font-bold text-gray-700 bg-green-500 border-2 border-gray-600 rounded-lg w-17 h-10  sm:mx-6 cursor-pointer">
+                Favoris
+            </Link>
           {user?.role === "admin" && (  <Link to={"/admin"} className="flex items-center justify-center text-lg font-bold text-gray-700 bg-green-500 border-2 border-gray-600 rounded-lg w-17 h-10  sm:mx-6 cursor-pointer">
                Admin
             </Link> )}
