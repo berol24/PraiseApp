@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import AddChant from "./AddChant";
 import { Link, useNavigate } from "react-router-dom";
-import { handleDelete } from "./services/HandleDelete";
-import Header from "./components/Header";
+import { handleDelete } from "../services/HandleDelete";
+import Header from "../components/Header";
 const apiUrl = import.meta.env.VITE_API_URL;
 const api = axios.create({ baseURL: apiUrl });
 
@@ -44,7 +44,7 @@ export default function ShowChant() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header navigate={navigate} user={user} />
+      <Header navigate={navigate} user={user} number_chants={filteredChants.length} />
       {/* Contenu principal */}
       <main className="container mx-auto p-6 sm:p-8 md:p-10 max-w-6xl">
         <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">

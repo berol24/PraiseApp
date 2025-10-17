@@ -1,8 +1,8 @@
 import  { useState, useEffect } from "react";
-import {  useParams,useNavigate } from "react-router-dom";
+import {  useParams,useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-import logo_PraiseApp from "./assets/logo_praiseApp.png";
-import { handleLogout } from "./services/HandleLogout";
+import logo_PraiseApp from "../assets/logo_praiseApp.png";
+import { handleLogout } from "../services/HandleLogout";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 const api = axios.create({ baseURL: apiUrl });
@@ -117,11 +117,11 @@ export default function EditChant() {
       <header className="bg-white shadow-md top-0 left-0 position-sticky z-10">
         <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between p-4">
           <div className="flex items-center mb-3 sm:mb-0">
-            <img
+             <Link to={"/showChants"}><img
               src={logo_PraiseApp} 
               alt="logo_PraiseApp"
               className="h-20 w-20 mr-3"
-            />
+            /></Link>
             {/* Petit écran - titre à côté */}
             <h1 className="text-2xl font-bold text-gray-700 sm:hidden">
               Modifier le Chant

@@ -9,12 +9,12 @@ import {
 } from "react-router-dom";
 
 import App from "./App";
-import Home from "./Home";
-import Login from "./Login";
-import Register from "./Register";
-import ShowChant from "./ShowChant";
-import ShowDetailChant from "./ShowDetailChant";
-import EditChant from "./EditChant";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ShowChant from "./pages/ShowChant";
+import ShowDetailChant from "./pages/ShowDetailChant";
+import EditChant from "./pages/EditChant";
 import AdminPage from "./components/AdminPage";
 import EditUser from "./components/EditUser";
 
