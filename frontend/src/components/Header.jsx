@@ -14,7 +14,7 @@ function Header({navigate,user ,number_chants}) {
                 className="h-16 w-16 mr-3 object-contain"
               /></Link>
               <h1 className="text-xl font-bold text-gray-700 sm:hidden">
-                Liste des Chants 
+                Liste des Chants ({number_chants}) 
               </h1>
             </div>
           </div>
