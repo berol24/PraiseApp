@@ -167,10 +167,10 @@ app.post("/api/favoris/:chantId",authMiddleware(["client", "manager", "admin"]),
     const index = user.favoris.indexOf(chantId);
 
     if (index === -1) {
-      // 🔹 Ajouter le chant
+      //  Ajouter le chant
       user.favoris.push(chantId);
     } else {
-      // 🔸 Retirer le chant
+      //  Retirer le chant
       user.favoris.splice(index, 1);
     }
 

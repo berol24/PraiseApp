@@ -59,6 +59,14 @@ export default function ShowChant() {
 
       setFavoris(res.data);
     } catch (err) {
+      // Détecter l'expiration du token :
+    if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+      // Token invalide ou expiré
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      navigate("/"); 
+      return;
+    }
       console.error("Erreur lors du chargement des favoris", err);
     }
   };
