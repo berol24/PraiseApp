@@ -114,7 +114,7 @@ export default function AddChant({ onClose, onAdded }) {
                   <option value="couplet">Couplet</option>
                   <option value="refrain">Refrain</option>
                   <option value="solo">Solo</option>
-                  <option value="pont">Pont</option>
+                  <option value="ass">Ass</option>
                   <option value="autre">Autre</option>
                 </select>
 

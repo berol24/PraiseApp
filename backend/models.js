@@ -22,7 +22,7 @@ const ChantSchema = new mongoose.Schema({
     {
       type: {
         type: String,
-        enum: ["couplet", "refrain", "solo", "pont", "autre"],
+        enum: ["couplet", "refrain", "solo", "ass", "autre"],
         required: true
       },
       numero: { type: Number },
