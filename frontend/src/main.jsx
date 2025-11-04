@@ -18,6 +18,8 @@ import EditChant from "./pages/EditChant";
 import AdminPage from "./components/AdminPage";
 import EditUser from "./components/EditUser";
 import Favoris from "./pages/Favoris";
+import PageNotFound from "./pages/PageNotFound";
+import ForgotPassword from "./pages/ForgotPassword";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -31,7 +33,8 @@ const router = createBrowserRouter(
       <Route path="admin" element={<AdminPage />} />
       <Route path="editUser/:IdUser" element={<EditUser />} />
       <Route path="favoris" element={<Favoris />} />
-      <Route path="*" element={<div>404 Not Found</div>} />
+      <Route path="forgot-password" element={<ForgotPassword/>} /> 
+      <Route path="*" element={<PageNotFound/>} />
     </Route>
   )
 );

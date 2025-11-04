@@ -77,6 +77,49 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
+
+// mot de passe oublié et réinitialisation
+app.post("/api/forgot-password", async (req, res) => {
+  const { email, password, confirmPassword } = req.body;
+   
+  try {
+    // 1. Vérifie si l’utilisateur existe
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({
+        message: "Aucun utilisateur trouvé avec cet email",
+        type: "danger",
+      });
+    }
+
+    // 2. Vérifie la correspondance des mots de passe
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        message: "Les mots de passe ne correspondent pas",
+        type: "danger",
+      });
+    }
+
+    // 3. Hash le nouveau mot de passe
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // 4. Met à jour dans la base de données
+    await User.updateOne({ email }, { mot_de_passe: hashedPassword });
+
+    res.status(200).json({
+      message: "Mot de passe modifié avec succès !",
+      type: "success",
+    });
+  } catch (err) {
+    console.error("Erreur lors de la réinitialisation:", err);
+    res.status(500).json({
+      message: "Erreur serveur lors du changement de mot de passe",
+      type: "danger",
+    });
+  }
+});
+
 // === Routes Users ===
 app.get("/api/users", async (_, res) => {
   const users = await User.find();
@@ -102,10 +145,7 @@ app.put("/api/users/:id", async (req, res) => {
   if (req.body.mot_de_passe && req.body.mot_de_passe.trim().length > 0) {
     user.mot_de_passe = await bcrypt.hash(req.body.mot_de_passe, 10);
   }
-
-
   await user.save();
-
   res.json(user);
 });
 
@@ -189,7 +229,7 @@ app.post("/api/favoris/:chantId",authMiddleware(["client", "manager", "admin"]),
 app.get("/favoris", authMiddleware(["client", "manager", "admin"]), async (req, res) => {
   try {
     const userId = req.user.id;
-    const user = await User.findById(userId).populate("favoris"); // 🔍 populate pour avoir les détails des chants
+    const user = await User.findById(userId).populate("favoris"); //  populate pour avoir les détails des chants
     
     res.status(200).json(user.favoris);
   } catch (error) {

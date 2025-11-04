@@ -56,6 +56,16 @@ export default function Login() {
             required
             className="border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
+            <div className="mt-3 flex justify-end">
+                <div className="text-sm">
+                  <Link
+                    to="/forgot-password"
+                    className="font-semibold text-blue-600 hover:text-bleu-800 hover:underline underline-offset-8"
+                  >
+                    Mot de passe oublié?
+                  </Link>
+                </div>
+              </div>
           {/* <button className="flex bg-blue-500 text-white font-semibold py-3 rounded hover:bg-blue-600 transition"> */}
             <button className="flex items-center justify-center gap-2 bg-blue-500 text-white font-semibold py-3 px-4 rounded cursor-pointer hover:bg-blue-600 transition">
             Se connecter{ loading && <img className="w-5 h-5 animate-spin" src={icon_loading} alt="Chargement..." />}
