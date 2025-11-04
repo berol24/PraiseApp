@@ -43,26 +43,8 @@ function InstallerButton() {
 
   if (!showButton) return null;
 
-  const style = {
-    position: "fixed",
-    top: "10px",
-    left: "50%",
-    transform: "translateX(-50%)",
-    display: "flex",
-    alignItems: "center",
-    gap: "5px",
-    zIndex: 1000,
-    padding: "8px 15px",
-    backgroundColor: "#fff",
-    color: "black",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
-  };
-
   return (
-    <button onClick={handleInstallClick} style={style}>
+    <button onClick={handleInstallClick} className="fixed top-0 left-1/2 transform -translate-x-1/2 bg-white text-black px-4 py-2 rounded-b-lg shadow-lg transition-transform duration-300 ease-in-out hover:-translate-y-1 flex items-center justify-between gap-2 w-[80%] md:w-auto">
       <span>Installer</span>
       <img src={download} alt="download_installation" className="w-5 h-5" />
     </button>
