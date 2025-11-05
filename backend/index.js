@@ -171,7 +171,7 @@ app.get("/api/chants/:id", async (req, res) => {
   res.json(chant);
 });
 
-app.post("/api/chants", authMiddleware(["admin"]), async (req, res) => {
+app.post("/api/chants", authMiddleware(["admin","client"]), async (req, res) => {
   try {
     const chant = await Chant.create({ ...req.body, ajoute_par: req.user.id });
     res.status(201).json(chant);
@@ -180,12 +180,12 @@ app.post("/api/chants", authMiddleware(["admin"]), async (req, res) => {
   }
 });
 
-app.put("/api/chants/:id", authMiddleware(["admin"]), async (req, res) => {
+app.put("/api/chants/:id", authMiddleware(["admin","client"]), async (req, res) => {
   const chant = await Chant.findByIdAndUpdate(req.params.id, req.body, { new: true });
   res.json(chant);
 });
 
-app.delete("/api/chants/:id", authMiddleware(["admin"]), async (req, res) => {
+app.delete("/api/chants/:id", authMiddleware(["admin","client"]), async (req, res) => {
   await Chant.findByIdAndDelete(req.params.id);
   res.json({ message: "Chant supprimé" });
 });

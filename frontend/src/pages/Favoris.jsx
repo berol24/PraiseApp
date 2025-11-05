@@ -11,6 +11,7 @@ export default function Favoris() {
   const [user, setUser] = useState(null);
   const [favoris, setFavoris] = useState([]);
   const navigate = useNavigate();
+console.log("mes fav",favoris.length);
 
   // ✅ Récupération de l'utilisateur
   useEffect(() => {
@@ -68,8 +69,8 @@ export default function Favoris() {
 
   return (
     <>
-      <Header user={user} number_chants={favoris.length}/>
-
+      <Header user={user} number_chants={favoris.length} navigate={navigate}/>
+      <h1 className="text-3xl font-extrabold text-center text-black-700 my-8">MES FAVORIS </h1>
       {favoris.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
           {favoris.map((c, index) => (
