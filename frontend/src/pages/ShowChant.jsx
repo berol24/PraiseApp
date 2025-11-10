@@ -116,14 +116,14 @@ export default function ShowChant() {
             className="w-full sm:w-64 border border-gray-400 rounded-lg py-2 px-3 text-base text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
           {/* Bouton Ajouter pour admin */}
-          {(user?.role === "admin" || user?.role === "manager") && (
+          {/* {(user?.role === "admin" || user?.role === "manager") && ( */}
             <button
               onClick={() => setShowAddForm(true)}
               className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-5 rounded-lg transition w-full sm:w-auto"
             >
               + Ajouter un chant
             </button>
-          )}{" "}
+          {/* )}{" "} */}
         </div>
 
         {/* Formulaire d'ajout si actif */}
@@ -166,7 +166,7 @@ export default function ShowChant() {
                     )}
                   </div>
 
-                  {(user?.role === "admin" || user?.role === "manager") && (
+                  {/* {(user?.role === "admin" || user?.role === "manager") && ( */}
                     <div className="flex space-x-4">
                       <Link
                         to={`/editChant/${c._id}`}
@@ -186,7 +186,7 @@ export default function ShowChant() {
                         Supprimer
                       </button>
                     </div>
-                  )}
+                  {/* )} */}
                 </div>
               </a>
             ))
