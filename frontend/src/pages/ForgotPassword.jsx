@@ -56,7 +56,6 @@ function ForgotPassword() {
           className="w-full border p-2 rounded"
           required
         />
-        {/* <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded">*/}
         <button
           type="submit"
           className="flex w-full justify-center items-center rounded-md bg-gradient-to-r from-blue-500 to-blue-600 px-3 py-3 text-lg font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-300"

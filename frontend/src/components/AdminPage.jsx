@@ -45,7 +45,7 @@ function AdminPage() {
 
   return (
     <>
-      <Header navigate={navigate} user={user} />
+      <Header navigate={navigate} user={user} titre="Gestion des utilisateurs"/>
       <div className="overflow-hidden rounded-lg border border-gray-200 shadow-sm ">
         <input
           type="text"

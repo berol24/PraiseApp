@@ -68,7 +68,7 @@ export default function Favoris() {
 
   return (
     <>
-      <Header user={user} number_chants={favoris.length}/>
+      <Header user={user} number_chants={favoris.length} titre="Mes Favoris"/>
 
       {favoris.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">

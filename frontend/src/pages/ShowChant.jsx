@@ -102,6 +102,7 @@ export default function ShowChant() {
         navigate={navigate}
         user={user}
         number_chants={filteredChants.length}
+        titre="Liste des Chants"
       />
       {/* Contenu principal */}
       <main className="container mx-auto p-6 sm:p-8 md:p-10 max-w-6xl">
