@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState, useCallback } from "react";
+import api from "../services/api";
 import AddChant from "./AddChant";
 import { Link, useNavigate } from "react-router-dom";
 import { handleDelete } from "../services/HandleDelete";
 import Header from "../components/Header";
-const apiUrl = import.meta.env.VITE_API_URL;
-const api = axios.create({ baseURL: apiUrl });
+// api instance imported
 
 export default function ShowChant() {
   const [user, setUser] = useState(null);
@@ -22,7 +21,7 @@ export default function ShowChant() {
     if (!storedUser) return navigate("/login");
     setUser(JSON.parse(storedUser));
     fetchChants();
-  }, []);
+  }, [navigate]);
 
   const fetchChants = async () => {
     try {
@@ -44,32 +43,25 @@ export default function ShowChant() {
     setFilteredChants(filtered);
   }, [searchTerm, chants]);
 
-  useEffect(() => {
-    fetchFavoris();
-  }, [user]);
-
-  const fetchFavoris = async () => {
+  const fetchFavoris = useCallback(async () => {
     if (!user) return;
     try {
-      const res = await api.get("/favoris", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
+      const res = await api.get("/api/chants/favoris");
       setFavoris(res.data);
     } catch (err) {
-      // Détecter l'expiration du token :
-    if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-      // Token invalide ou expiré
-      localStorage.removeItem("user");
-      localStorage.removeItem("token");
-      navigate("/"); 
-      return;
-    }
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        navigate("/");
+        return;
+      }
       console.error("Erreur lors du chargement des favoris", err);
     }
-  };
+  }, [user, navigate]);
+
+  useEffect(() => {
+    fetchFavoris();
+  }, [fetchFavoris]);
 
   //  Ajouter ou retirer un favori
   const handleFavori = async (chantId, e) => {
@@ -77,16 +69,7 @@ export default function ShowChant() {
     e.stopPropagation();
 
     try {
-      const res = await api.post(
-        `/api/favoris/${chantId}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
+      await api.post(`/api/chants/favoris/${chantId}`);
       fetchFavoris();
     } catch (err) {
       console.error("Erreur favoris :", err);
@@ -138,7 +121,7 @@ export default function ShowChant() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredChants.length > 0 ? (
             filteredChants.map((c) => (
-              <a href={`/showChants/${c._id}`} key={c._id} className="block">
+              <Link to={`/showChants/${c._id}`} key={c._id} className="block">
                 <div className="bg-white shadow-lg rounded-2xl p-5 flex flex-col justify-between cursor-pointer hover:shadow-xl transition">
                   <div className="flex justify-between items-start">
                     <div>
@@ -188,7 +171,7 @@ export default function ShowChant() {
                     </div>
                   {/* )} */}
                 </div>
-              </a>
+              </Link>
             ))
           ) : (
             <div className="text-center">Aucun chant trouvé</div>

@@ -1,16 +1,11 @@
-import axios from "axios";
-const apiUrl = import.meta.env.VITE_API_URL;
-const api = axios.create({ baseURL: apiUrl });
+import api from "./api";
 
 export const handleDeleteUser = async (id,navigate,fetchUsers) => {
 
   if (!window.confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) return;
 
   try {
-    const token = localStorage.getItem("token");
-    await api.delete(`/api/users/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    await api.delete(`/api/users/${id}`);
 
     navigate("/admin");
     fetchUsers();

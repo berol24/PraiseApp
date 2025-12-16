@@ -1,9 +1,7 @@
-import axios from "axios";
 import { useEffect } from "react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-const apiUrl = import.meta.env.VITE_API_URL;
-const api = axios.create({ baseURL: apiUrl });
+import api from "../services/api";
 function EditUser() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -52,8 +50,7 @@ function EditUser() {
     setError(null);
 
     try {
-      const token = localStorage.getItem("token");
-      console.log("Token utilisé:", token);
+      // token header is attached automatically by `api` interceptor
 
       // On prépare le payload à envoyer
       const payload = {
@@ -65,9 +62,7 @@ function EditUser() {
       if (form.mot_de_passe && form.mot_de_passe.trim().length > 0) {
         payload.mot_de_passe = form.mot_de_passe;
       }
-      await api.put(`/api/users/${IdUser}`, payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.put(`/api/users/${IdUser}`, payload);
 
       alert("Utilisateur modifié avec succès !");
       navigate("/admin");

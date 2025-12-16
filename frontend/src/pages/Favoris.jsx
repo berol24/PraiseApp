@@ -1,11 +1,8 @@
 // src/pages/Favoris.jsx
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
-
-const apiUrl = import.meta.env.VITE_API_URL;
-const api = axios.create({ baseURL: apiUrl });
+import api from "../services/api";
 
 export default function Favoris() {
   const [user, setUser] = useState(null);
@@ -18,29 +15,23 @@ console.log("mes fav",favoris.length);
     const storedUser = localStorage.getItem("user");
     if (!storedUser) return navigate("/login");
     setUser(JSON.parse(storedUser));
-  }, []);
+  }, [navigate]);
 
   // ✅ Récupération des favoris depuis le backend
-  useEffect(() => {
-    fetchFavoris();
-  }, [user]);
-
-  const fetchFavoris = async () => {
+  const fetchFavoris = useCallback(async () => {
     if (!user) return;
     try {
-      const res = await api.get("/favoris", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const res = await api.get("/api/chants/favoris");
       console.log("favoris backend:", res.data);
-
-      // res.data doit être un tableau d’objets chants
       setFavoris(res.data);
     } catch (err) {
       console.error("Erreur lors du chargement des favoris", err);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    fetchFavoris();
+  }, [fetchFavoris]);
 
   // Ajouter ou retirer un favori
   const handleFavori = async (chantId, e) => {
@@ -48,16 +39,7 @@ console.log("mes fav",favoris.length);
     e.stopPropagation();
 
     try {
-      const res = await api.post(
-        `/api/favoris/${chantId}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
+      await api.post(`/api/chants/favoris/${chantId}`);
       fetchFavoris();
     } catch (err) {
       console.error("Erreur favoris :", err);
@@ -74,11 +56,7 @@ console.log("mes fav",favoris.length);
       {favoris.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
           {favoris.map((c, index) => (
-            <a
-              href={`/showChants/${c._id}`}
-              key={c._id || index}
-              className="block"
-            >
+            <Link to={`/showChants/${c._id}`} key={c._id || index} className="block">
               <div className="bg-white shadow-lg rounded-2xl p-5 flex flex-col justify-between cursor-pointer hover:shadow-xl transition">
                 <div className="flex justify-between items-start">
                   <div>
@@ -105,7 +83,7 @@ console.log("mes fav",favoris.length);
                   )}
                 </div>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       ) : (

@@ -1,7 +1,5 @@
 
-import axios from "axios";
-const apiUrl = import.meta.env.VITE_API_URL;
-const api = axios.create({ baseURL: apiUrl });
+import api from "./api";
 
 export const handleDelete = async (id,navigate,fetchChants) => {
 
@@ -9,10 +7,7 @@ export const handleDelete = async (id,navigate,fetchChants) => {
   if (!window.confirm("Voulez-vous vraiment supprimer ce chant ?")) return;
 
   try {
-    const token = localStorage.getItem("token");
-    await api.delete(`/api/chants/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    await api.delete(`/api/chants/${id}`);
 
     navigate("/showChants");
     fetchChants();

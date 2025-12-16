@@ -1,11 +1,8 @@
 import  { useState, useEffect } from "react";
 import {  useParams,useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import api from "../services/api";
 import logo_PraiseApp from "../assets/logo_praiseApp.png";
 import { handleLogout } from "../services/HandleLogout";
-
-const apiUrl = import.meta.env.VITE_API_URL;
-const api = axios.create({ baseURL: apiUrl });
 
 export default function EditChant() {
   const { Idchant } = useParams();
@@ -89,7 +86,6 @@ export default function EditChant() {
     setError(null);
 
     try {
-     const token = localStorage.getItem("token");
 
       const categoriesArr = form.categories
         .split(",")
@@ -99,8 +95,6 @@ export default function EditChant() {
       await api.put(`/api/chants/${Idchant}`, {
         ...form,
         categories: categoriesArr,
-      },{
-        headers: { Authorization: `Bearer ${token}` }
       });
 
       alert("Chant modifié avec succès !");

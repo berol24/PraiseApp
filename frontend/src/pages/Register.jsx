@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import icon_loading from "../assets/icon_loading.png";
+import api from "../services/api";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -10,24 +11,17 @@ export default function Register() {
   const [error, setError] = useState("");
   const[loading, setLoading] = useState(false);
 
-  const apiUrl = import.meta.env.VITE_API_URL;
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
-      const res = await fetch(`${apiUrl}/api/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-
-      if (!res.ok) throw new Error("Erreur lors de l’inscription");
+      if (!navigator.onLine) throw new Error("Vous êtes hors ligne — vérifiez votre connexion");
+      await api.post(`/api/register`, form);
       navigate("/login");
     } catch (err) {
-      setError(err.message);
-    }
+      setError(err.response?.data?.message || err.message || "Erreur lors de l'inscription");
+    } finally { setLoading(false); }
   };
 
   return (

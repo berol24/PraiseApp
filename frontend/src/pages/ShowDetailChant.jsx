@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { formatDate } from "../utils/FormatDate";
 import { handleDownloadPDF } from "../utils/HandleDownloadPDF";
-const apiUrl = import.meta.env.VITE_API_URL;
+import api from "../services/api";
 function ShowDetailChant() {
   const Idchant = useParams().Idchant;
   const [mesChants, setMesChants] = useState(null);
@@ -14,28 +14,19 @@ function ShowDetailChant() {
   useEffect(() => {
     if (!Idchant) return;
 
-    setLoading(true);
-    fetch(`${apiUrl}/api/chants/${Idchant}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Erreur réseau");
-        return res.json();
-      })
-      .then((data) => {
-        setMesChants(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        // Détecter l'expiration du token :
-    if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-      // Token invalide ou expiré
-      localStorage.removeItem("user");
-      localStorage.removeItem("token");
-      navigate("/");  
-      return;
-    }
+    async function fetchChant() {
+      setLoading(true);
+      try {
+        const res = await api.get(`/api/chants/${Idchant}`);
+        setMesChants(res.data);
+      } catch (err) {
         console.error("Erreur lors du chargement du chant :", err);
+      } finally {
         setLoading(false);
-      });
+      }
+    }
+
+    fetchChant();
   }, [Idchant]);
 
   if (loading) return <p>Chargement...</p>;

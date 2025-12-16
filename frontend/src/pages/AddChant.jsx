@@ -1,10 +1,7 @@
 
 
 import React, { useState } from "react";
-import axios from "axios";
-
-const apiUrl = import.meta.env.VITE_API_URL;
-const api = axios.create({ baseURL: apiUrl });
+import api from "../services/api";
 
 export default function AddChant({ onClose, onAdded }) {
   const [form, setForm] = useState({
@@ -55,7 +52,6 @@ export default function AddChant({ onClose, onAdded }) {
 
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
       const data = {
         ...form,
         categories: form.categories
@@ -63,9 +59,7 @@ export default function AddChant({ onClose, onAdded }) {
           : []
       };
 
-      await api.post("/api/chants", data, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.post("/api/chants", data);
 
       onAdded();
       onClose();

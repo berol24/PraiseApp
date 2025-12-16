@@ -1,5 +1,6 @@
 
 import React from "react";
+import "./styles/App.css";
 import ReactDOM from "react-dom/client";
 import {
   createBrowserRouter,
@@ -20,6 +21,7 @@ import EditUser from "./components/EditUser";
 import Favoris from "./pages/Favoris";
 import PageNotFound from "./pages/PageNotFound";
 import ForgotPassword from "./pages/ForgotPassword";
+import RequireAuth from "./components/RequireAuth";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -27,20 +29,27 @@ const router = createBrowserRouter(
       <Route index element={<Home />} />
       <Route path="login" element={<Login />} />
       <Route path="register" element={<Register />} />
-      <Route path="showChants" element={<ShowChant />} />
-      <Route path="showChants/:Idchant" element={<ShowDetailChant />} />
-      <Route path="editChant/:Idchant" element={<EditChant />} />
-      <Route path="admin" element={<AdminPage />} />
-      <Route path="editUser/:IdUser" element={<EditUser />} />
-      <Route path="favoris" element={<Favoris />} />
+      <Route path="showChants" element={<RequireAuth><ShowChant /></RequireAuth>} />
+      <Route path="showChants/:Idchant" element={<RequireAuth><ShowDetailChant /></RequireAuth>} />
+      <Route path="editChant/:Idchant" element={<RequireAuth><EditChant /></RequireAuth>} />
+      <Route path="admin" element={<RequireAuth><AdminPage /></RequireAuth>} />
+      <Route path="editUser/:IdUser" element={<RequireAuth><EditUser /></RequireAuth>} />
+      <Route path="favoris" element={<RequireAuth><Favoris /></RequireAuth>} />
       <Route path="forgot-password" element={<ForgotPassword/>} /> 
       <Route path="*" element={<PageNotFound/>} />
     </Route>
   )
 );
 
+import { AuthProvider } from "./hooks/useAuth";
+import ToastProvider from "./components/ToastProvider";
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <ToastProvider>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </ToastProvider>
   </React.StrictMode>
 );

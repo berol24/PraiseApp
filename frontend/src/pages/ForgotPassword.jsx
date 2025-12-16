@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
- const apiUrl = import.meta.env.VITE_API_URL;
+import api from "../services/api";
 function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,13 +12,8 @@ function ForgotPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const res = await fetch(`${apiUrl}/api/forgot-password`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, confirmPassword }),
-    });
-
-    const data = await res.json(); 
+    const res = await api.post(`/api/forgot-password`, { email, password, confirmPassword });
+    const data = res.data;
     const timer =  setTimeout(() => {
       setMessage('');
       navigate('/login');

@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Header from "./Header";
-import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { formatDate } from "../utils/FormatDate";
 import { handleDeleteUser } from "../services/HandleDeleteUser";
-
-const apiUrl = import.meta.env.VITE_API_URL;
-const api = axios.create({ baseURL: apiUrl });
+import api from "../services/api";
 function AdminPage() {
   const [user, setUser] = useState(null);
   const [myUsers, setMyUsers] = useState([]);
@@ -20,7 +17,7 @@ function AdminPage() {
     if (!storedUser) return navigate("/login");
     setUser(JSON.parse(storedUser));
     fetchUsers();
-  }, []);
+  }, [navigate]);
 
   const fetchUsers = async () => {
     try {
