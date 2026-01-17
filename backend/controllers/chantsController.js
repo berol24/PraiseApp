@@ -22,7 +22,12 @@ export async function createChant(req, res) {
 }
 
 export async function updateChant(req, res) {
-  const chant = await Chant.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  const chant = await Chant.findByIdAndUpdate(
+    req.params.id, 
+    { ...req.body, date_mise_a_jour: new Date() }, 
+    { new: true }
+  );
+  if (!chant) return res.status(404).json({ message: "Chant introuvable" });
   res.json(chant);
 }
 
