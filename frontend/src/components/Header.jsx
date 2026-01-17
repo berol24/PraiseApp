@@ -36,7 +36,7 @@ function Header({ user, number_chants, titre }) {
           {titre} {number_chants ? `(${number_chants})` : ""}
         </h1>
         
-        <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end w-full sm:w-auto">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-center sm:justify-end w-full sm:w-auto">
           <Button to={"/favoris"} variant="success" className="text-sm sm:text-base flex items-center gap-1">
             <Star className="w-4 h-4" />
             Favoris
@@ -49,10 +49,10 @@ function Header({ user, number_chants, titre }) {
           )}
           <Link
             to="/profile"
-            className="flex items-center justify-center bg-gradient-to-br from-blue-700 via-blue-800 to-orange-500 rounded-full w-10 h-10 sm:w-12 sm:h-12 shadow-md border-2 border-white hover:scale-110 transition-transform cursor-pointer"
+            className="flex items-center justify-center bg-gradient-to-br from-blue-700 via-blue-800 to-orange-500 rounded-full w-10 h-10 sm:w-12 sm:h-12 shadow-md border-2 border-white hover:scale-110 transition-transform cursor-pointer mx-auto sm:mx-0"
             title="Voir mon profil"
           >
-            <span className="text-base sm:text-lg font-bold text-white">{user?.nom[0]?.toUpperCase()}</span>
+            <span className="text-base sm:text-lg font-bold text-white leading-none select-none">{user?.nom[0]?.toUpperCase() || "?"}</span>
           </Link>
           <Button variant="danger" onClick={() => handleLogout(nav)} className="text-sm sm:text-base flex items-center gap-1">
             <LogOut className="w-4 h-4" />

@@ -6,6 +6,7 @@ import api from "../services/api";
 import Modal from "../components/common/Modal";
 import Button from "../components/common/Button";
 import LanguageSelect from "../components/common/LanguageSelect";
+import { toast } from "../services/toast";
 
 export default function AddChant({ onClose, onAdded }) {
   const [form, setForm] = useState({
@@ -65,6 +66,7 @@ export default function AddChant({ onClose, onAdded }) {
 
       await api.post("/api/chants", data);
 
+      toast("Chant ajouté avec succès !", "success");
       onAdded();
       onClose();
     } catch (err) {
