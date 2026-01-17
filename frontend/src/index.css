@@ -180,6 +180,17 @@ input::placeholder, textarea::placeholder {
 	}
 }
 
+@keyframes slideDown {
+	from {
+		opacity: 0;
+		transform: translateY(-12px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
 .animate-fadeIn {
 	animation: fadeIn 0.3s ease-out;
 }
@@ -190,6 +201,10 @@ input::placeholder, textarea::placeholder {
 
 .animate-scaleIn {
 	animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-slideDown {
+	animation: slideDown 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Responsive */
