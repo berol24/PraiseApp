@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Mail, Lock, LogIn, Loader2, ArrowRight } from "lucide-react";
+import { Mail, Lock, LogIn, Loader2, ArrowRight, Home } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { setToken as saveToken } from "../services/authService";
 import api from "../services/api";
@@ -134,6 +134,16 @@ export default function Login() {
               <ArrowRight className="w-3 h-3" />
             </Link>
           </p>
+          
+          <div className="mt-6 pt-6 border-t border-gray-200/50">
+            <Link
+              to="/"
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-xl transition-all shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <Home className="w-5 h-5" />
+              Retour à l'accueil
+            </Link>
+          </div>
         </div>
       </div>
     </div>
