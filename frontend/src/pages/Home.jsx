@@ -1,6 +1,31 @@
 import Button from "../components/common/Button";
+import { Music2, Star, Share2 } from "lucide-react";
 
 export default function Home() {
+  const cards = [
+    {
+      icon: Music2,
+      title: "Découvrir",
+      desc: "Explorez une vaste collection de chants",
+      bg: "bg-blue-100",
+      iconColor: "text-blue-600",
+    },
+    {
+      icon: Star,
+      title: "Favoris",
+      desc: "Sauvegardez vos chants préférés",
+      bg: "bg-amber-100",
+      iconColor: "text-amber-600",
+    },
+    {
+      icon: Share2,
+      title: "Partager",
+      desc: "Partagez avec votre communauté",
+      bg: "bg-cyan-100",
+      iconColor: "text-cyan-600",
+    },
+  ];
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden">
       {/* Dégradé de fond animé - Couleurs du logo */}
@@ -40,21 +65,18 @@ export default function Home() {
 
         {/* Cards d'illustration */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-            <div className="text-4xl mb-4">🎼</div>
-            <h3 className="font-bold text-lg text-gray-800 mb-2">Découvrir</h3>
-            <p className="text-gray-600 text-sm">Explorez une vaste collection de chants</p>
-          </div>
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-            <div className="text-4xl mb-4">⭐</div>
-            <h3 className="font-bold text-lg text-gray-800 mb-2">Favoris</h3>
-            <p className="text-gray-600 text-sm">Sauvegardez vos chants préférés</p>
-          </div>
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-            <div className="text-4xl mb-4">📱</div>
-            <h3 className="font-bold text-lg text-gray-800 mb-2">Partager</h3>
-            <p className="text-gray-600 text-sm">Partagez avec votre communauté</p>
-          </div>
+          {cards.map(({ icon: Icon, title, desc, bg, iconColor }) => (
+            <div
+              key={title}
+              className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group"
+            >
+              <div className={`inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl mb-4 ${bg} ${iconColor} group-hover:scale-110 transition-transform duration-300`}>
+                <Icon className="w-7 h-7 sm:w-8 sm:h-8" strokeWidth={2} />
+              </div>
+              <h3 className="font-bold text-lg text-gray-800 mb-2">{title}</h3>
+              <p className="text-gray-600 text-sm">{desc}</p>
+            </div>
+          ))}
         </div>
       </div>
     </div>

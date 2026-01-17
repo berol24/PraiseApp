@@ -1,16 +1,14 @@
 import api from "./api";
+import { toast } from "./toast";
 
-export const handleDeleteUser = async (id,navigate,fetchUsers) => {
-
-  if (!window.confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) return;
-
+export const handleDeleteUser = async (id, navigate, fetchUsers) => {
   try {
     await api.delete(`/api/users/${id}`);
-
+    toast("Utilisateur supprimé avec succès !", "success");
     navigate("/admin");
     fetchUsers();
   } catch (err) {
     console.error("Erreur lors de la suppression :", err);
-    alert("Erreur lors de la suppression, veuillez réessayer.");
+    toast("Erreur lors de la suppression, veuillez réessayer.", "error");
   }
 };

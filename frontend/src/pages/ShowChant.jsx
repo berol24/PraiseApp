@@ -5,6 +5,7 @@ import AddChant from "./AddChant";
 import { Link, useNavigate } from "react-router-dom";
 import { handleDelete } from "../services/HandleDelete";
 import Header from "../components/Header";
+import ConfirmModal from "../components/common/ConfirmModal";
 // api instance imported
 
 export default function ShowChant() {
@@ -14,6 +15,7 @@ export default function ShowChant() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredChants, setFilteredChants] = useState([]);
   const [favoris, setFavoris] = useState([]); // liste locale des favoris
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, chantId: null });
 
   const navigate = useNavigate();
 
@@ -178,7 +180,7 @@ export default function ShowChant() {
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        handleDelete(c._id, navigate, fetchChants);
+                        setDeleteModal({ isOpen: true, chantId: c._id });
                       }}
                       className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-2 px-4 rounded-xl transition-all shadow-md hover:shadow-lg text-sm flex items-center justify-center gap-2"
                     >
@@ -200,6 +202,22 @@ export default function ShowChant() {
           )}
         </div>
       </main>
+
+      {/* Modal de confirmation de suppression */}
+      <ConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, chantId: null })}
+        onConfirm={() => {
+          if (deleteModal.chantId) {
+            handleDelete(deleteModal.chantId, navigate, fetchChants);
+          }
+        }}
+        title="Supprimer le chant"
+        message="Voulez-vous vraiment supprimer ce chant ? Cette action est irréversible."
+        confirmText="Supprimer"
+        cancelText="Annuler"
+        variant="danger"
+      />
     </div>
   );
 }

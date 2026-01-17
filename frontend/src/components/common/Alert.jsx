@@ -13,55 +13,97 @@ export default function Alert({ message, type = "info", onClose, duration = 5000
 
   const styles = {
     success: {
-      bg: "bg-emerald-50",
-      border: "border-emerald-200",
-      text: "text-emerald-800",
+      bg: "bg-gradient-to-r from-emerald-50 to-green-50",
+      border: "border-emerald-300",
+      text: "text-emerald-900",
+      iconBg: "bg-emerald-500",
+      iconColor: "text-white",
       icon: CheckCircle,
-      iconColor: "text-emerald-600",
+      shadow: "shadow-emerald-500/20",
+      accent: "bg-emerald-500",
     },
     error: {
-      bg: "bg-red-50",
-      border: "border-red-200",
-      text: "text-red-800",
+      bg: "bg-gradient-to-r from-red-50 to-rose-50",
+      border: "border-red-300",
+      text: "text-red-900",
+      iconBg: "bg-red-500",
+      iconColor: "text-white",
       icon: AlertCircle,
-      iconColor: "text-red-600",
+      shadow: "shadow-red-500/20",
+      accent: "bg-red-500",
+    },
+    danger: {
+      bg: "bg-gradient-to-r from-red-50 to-rose-50",
+      border: "border-red-300",
+      text: "text-red-900",
+      iconBg: "bg-red-500",
+      iconColor: "text-white",
+      icon: AlertCircle,
+      shadow: "shadow-red-500/20",
+      accent: "bg-red-500",
     },
     warning: {
-      bg: "bg-amber-50",
-      border: "border-amber-200",
-      text: "text-amber-800",
+      bg: "bg-gradient-to-r from-amber-50 to-orange-50",
+      border: "border-amber-300",
+      text: "text-amber-900",
+      iconBg: "bg-amber-500",
+      iconColor: "text-white",
       icon: AlertTriangle,
-      iconColor: "text-amber-600",
+      shadow: "shadow-amber-500/20",
+      accent: "bg-amber-500",
     },
     info: {
-      bg: "bg-blue-50",
-      border: "border-blue-200",
-      text: "text-blue-800",
+      bg: "bg-gradient-to-r from-blue-50 to-cyan-50",
+      border: "border-blue-300",
+      text: "text-blue-900",
+      iconBg: "bg-blue-700",
+      iconColor: "text-white",
       icon: Info,
-      iconColor: "text-blue-700",
+      shadow: "shadow-blue-500/20",
+      accent: "bg-blue-700",
     },
   };
 
-  const style = styles[type] || styles.info;
+  // Mapper "danger" vers "error" si nécessaire
+  const normalizedType = type === "danger" ? "error" : type;
+  const style = styles[normalizedType] || styles.info;
   const Icon = style.icon;
 
   return (
     <div
-      className={`fixed top-4 right-4 z-50 ${style.bg} ${style.border} border-2 rounded-xl shadow-2xl p-4 min-w-[300px] max-w-[400px] animate-slideUp`}
+      className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[120] ${style.bg} ${style.border} border-2 rounded-2xl shadow-2xl ${style.shadow} w-[calc(100vw-2rem)] max-w-[420px] sm:max-w-[480px] overflow-hidden animate-scaleIn backdrop-blur-sm`}
+      role="alert"
+      aria-live="assertive"
     >
-      <div className="flex items-start gap-3">
-        <Icon className={`w-6 h-6 ${style.iconColor} flex-shrink-0 mt-0.5`} />
-        <div className="flex-1">
-          <p className={`${style.text} text-sm font-medium`}>{message}</p>
+      {/* Barre d'accent colorée en haut */}
+      <div className={`h-1 ${style.accent}`} aria-hidden="true" />
+      
+      <div className="p-4 sm:p-5">
+        <div className="flex items-start gap-4">
+          {/* Icône dans un cercle coloré */}
+          <div className={`${style.iconBg} rounded-full p-2.5 flex-shrink-0 shadow-lg`}>
+            <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${style.iconColor}`} strokeWidth={2.5} />
+          </div>
+          
+          {/* Message */}
+          <div className="flex-1 min-w-0 pt-0.5">
+            <p className={`${style.text} text-sm sm:text-base font-semibold leading-relaxed`}>
+              {message}
+            </p>
+          </div>
+          
+          {/* Bouton fermer */}
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className={`flex-shrink-0 p-1.5 rounded-lg ${style.text} hover:bg-white/50 active:bg-white/70 transition-all duration-200 min-w-[32px] min-h-[32px] flex items-center justify-center`}
+              aria-label="Fermer"
+            >
+              <X className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2.5} />
+            </button>
+          )}
         </div>
-        {onClose && (
-          <button
-            onClick={onClose}
-            className={`${style.text} hover:opacity-70 transition-opacity flex-shrink-0`}
-          >
-            <X className="w-5 h-5" />
-          </button>
-        )}
       </div>
     </div>
   );

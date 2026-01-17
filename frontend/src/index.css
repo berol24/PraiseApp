@@ -207,6 +207,36 @@ input::placeholder, textarea::placeholder {
 	animation: slideDown 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+@keyframes slideUpFromRight {
+	from {
+		opacity: 0;
+		transform: translateX(calc(100% + 1rem)) scale(0.95);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0) scale(1);
+	}
+}
+
+.animate-slideUpFromRight {
+	animation: slideUpFromRight 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes slideUpFromBottom {
+	from {
+		opacity: 0;
+		transform: translateY(100%);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.animate-slideUpFromBottom {
+	animation: slideUpFromBottom 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
 /* Responsive */
 @media (min-width: 640px) {
 	:root {

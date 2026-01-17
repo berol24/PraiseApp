@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { formatDate } from "../utils/FormatDate";
 import { handleDeleteUser } from "../services/HandleDeleteUser";
 import api from "../services/api";
+import ConfirmModal from "./common/ConfirmModal";
 
 function AdminPage() {
   const [user, setUser] = useState(null);
@@ -12,6 +13,7 @@ function AdminPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [roleFilter, setRoleFilter] = useState("all");
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, userId: null, userName: "" });
 
   const navigate = useNavigate();
 
@@ -199,7 +201,7 @@ function AdminPage() {
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              handleDeleteUser(u._id, navigate, fetchUsers);
+                              setDeleteModal({ isOpen: true, userId: u._id, userName: u.nom });
                             }}
                           >
                             <Trash2 className="w-4 h-4" />
@@ -227,6 +229,22 @@ function AdminPage() {
           </div>
         </div>
       </main>
+
+      {/* Modal de confirmation de suppression */}
+      <ConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, userId: null, userName: "" })}
+        onConfirm={() => {
+          if (deleteModal.userId) {
+            handleDeleteUser(deleteModal.userId, navigate, fetchUsers);
+          }
+        }}
+        title="Supprimer l'utilisateur"
+        message={`Voulez-vous vraiment supprimer l'utilisateur "${deleteModal.userName}" ? Cette action est irréversible.`}
+        confirmText="Supprimer"
+        cancelText="Annuler"
+        variant="danger"
+      />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import api from "../services/api";
 import Header from "../components/Header";
 import Button from "../components/common/Button";
 import LanguageSelect from "../components/common/LanguageSelect";
+import { toast } from "../services/toast";
 
 export default function EditChant() {
   const { Idchant } = useParams();
@@ -129,12 +130,7 @@ export default function EditChant() {
       };
       setOriginalForm(JSON.parse(JSON.stringify(updatedForm)));
 
-      // Utiliser un toast au lieu d'alert
-      if (window.showToast) {
-        window.showToast("Chant modifié avec succès !", "success");
-      } else {
-        alert("Chant modifié avec succès !");
-      }
+      toast("Chant modifié avec succès !", "success");
       setIsEditing(false);
     } catch (err) {
       setError("Erreur lors de la sauvegarde");

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
+import { toast } from "../services/toast";
 function EditUser() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -64,7 +65,7 @@ function EditUser() {
       }
       await api.put(`/api/users/${IdUser}`, payload);
 
-      alert("Utilisateur modifié avec succès !");
+      toast("Utilisateur modifié avec succès !", "success");
       navigate("/admin");
     } catch (err) {
       setError("Erreur lors de la sauvegarde");
