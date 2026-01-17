@@ -21,6 +21,7 @@ import EditUser from "./components/EditUser";
 import Favoris from "./pages/Favoris";
 import PageNotFound from "./pages/PageNotFound";
 import ForgotPassword from "./pages/ForgotPassword";
+import Profile from "./pages/Profile";
 import RequireAuth from "./components/RequireAuth";
 
 const router = createBrowserRouter(
@@ -35,6 +36,7 @@ const router = createBrowserRouter(
       <Route path="admin" element={<RequireAuth><AdminPage /></RequireAuth>} />
       <Route path="editUser/:IdUser" element={<RequireAuth><EditUser /></RequireAuth>} />
       <Route path="favoris" element={<RequireAuth><Favoris /></RequireAuth>} />
+      <Route path="profile" element={<RequireAuth><Profile /></RequireAuth>} />
       <Route path="forgot-password" element={<ForgotPassword/>} /> 
       <Route path="*" element={<PageNotFound/>} />
     </Route>

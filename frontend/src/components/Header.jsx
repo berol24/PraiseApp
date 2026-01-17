@@ -1,6 +1,7 @@
 import { handleLogout } from "../services/HandleLogout";
 import logo_PraiseApp from "../assets/logo_praiseApp.png";
 import { Link, useNavigate } from "react-router-dom";
+import { Star, Settings, LogOut } from "lucide-react";
 import Button from "./common/Button";
 
 function Header({ user, number_chants, titre }) {
@@ -8,47 +9,58 @@ function Header({ user, number_chants, titre }) {
   console.log("number_chants dans header", number_chants);
 
   return (
-    <header className="bg-white shadow-md sticky top-0 z-10">
+    <header className="bg-white/90 backdrop-blur-xl shadow-lg sticky top-0 z-50 border-b border-gray-200/50">
       <div className="container mx-auto flex flex-wrap items-center justify-between p-4 gap-4">
-          <div className="flex items-center justify-between w-full sm:w-auto">
-            <div className="flex items-center">
-              <Link to={"/showChants"}>
-                {logo_PraiseApp ? (
-                  <img
-                    src={logo_PraiseApp}
-                    alt="logo_PraiseApp"
-                    className="h-16 w-16 mr-3 object-contain"
-                  />
-                ) : (
-                  <span className="h-16 w-16 mr-3 flex items-center justify-center bg-gray-200 rounded-full font-bold text-lg">P</span>
-                )}
-              </Link>
-              <h1 className="text-xl font-bold text-gray-700 sm:hidden">
-                {titre} {number_chants ? number_chants : ""}
-              </h1>
-            </div>
+        <div className="flex items-center justify-between w-full sm:w-auto">
+          <div className="flex items-center gap-3">
+            <Link to={"/showChants"} className="hover:opacity-80 transition-opacity">
+              {logo_PraiseApp ? (
+                <img
+                  src={logo_PraiseApp}
+                  alt="logo_PraiseApp"
+                  className="h-14 w-14 sm:h-16 sm:w-16 object-contain rounded-xl shadow-md"
+                />
+              ) : (
+                <div className="h-14 w-14 sm:h-16 sm:w-16 flex items-center justify-center bg-gradient-to-br from-blue-700 via-blue-800 to-orange-500 rounded-xl font-bold text-white text-xl shadow-lg">
+                  P
+                </div>
+              )}
+            </Link>
+            <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-800 via-blue-700 to-orange-500 bg-clip-text text-transparent sm:hidden">
+              {titre} {number_chants ? `(${number_chants})` : ""}
+            </h1>
           </div>
+        </div>
 
-          <h1 className="hidden sm:block text-2xl md:text-3xl font-bold text-gray-700 text-center flex-1">
-            {titre} {number_chants ? (number_chants) : ""}
-          </h1>
-          <Button to={"/favoris"} variant="secondary" className="sm:mx-4">
+        <h1 className="hidden sm:block text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-800 via-blue-700 to-orange-500 bg-clip-text text-transparent text-center flex-1">
+          {titre} {number_chants ? `(${number_chants})` : ""}
+        </h1>
+        
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end w-full sm:w-auto">
+          <Button to={"/favoris"} variant="success" className="text-sm sm:text-base flex items-center gap-1">
+            <Star className="w-4 h-4" />
             Favoris
           </Button>
           {user?.role === "admin" && (
-            <Button to={"/admin"} variant="secondary" className="sm:mx-4">
+            <Button to={"/admin"} variant="secondary" className="text-sm sm:text-base flex items-center gap-1">
+              <Settings className="w-4 h-4" />
               Admin
             </Button>
           )}
-          <div className="flex items-center justify-center border-2 border-gray-600 rounded-full w-12 h-12 sm:mx-6">
-            <span className="text-lg font-bold text-gray-700">{user?.nom[0]}</span>
-          </div>
-
-          <Button variant="danger" onClick={() => handleLogout(nav)}>
+          <Link
+            to="/profile"
+            className="flex items-center justify-center bg-gradient-to-br from-blue-700 via-blue-800 to-orange-500 rounded-full w-10 h-10 sm:w-12 sm:h-12 shadow-md border-2 border-white hover:scale-110 transition-transform cursor-pointer"
+            title="Voir mon profil"
+          >
+            <span className="text-base sm:text-lg font-bold text-white">{user?.nom[0]?.toUpperCase()}</span>
+          </Link>
+          <Button variant="danger" onClick={() => handleLogout(nav)} className="text-sm sm:text-base flex items-center gap-1">
+            <LogOut className="w-4 h-4" />
             Déconnexion
           </Button>
         </div>
-      </header>
+      </div>
+    </header>
   )
 }
 

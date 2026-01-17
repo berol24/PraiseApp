@@ -1,12 +1,16 @@
-import  { useState, useEffect } from "react";
-import {  useParams,useNavigate, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { X, Plus, Edit, Save, XCircle } from "lucide-react";
 import api from "../services/api";
-import logo_PraiseApp from "../assets/logo_praiseApp.png";
-import { handleLogout } from "../services/HandleLogout";
+import Header from "../components/Header";
+import Button from "../components/common/Button";
+import LanguageSelect from "../components/common/LanguageSelect";
 
 export default function EditChant() {
   const { Idchant } = useParams();
   const navigate = useNavigate();
+  const [isEditing, setIsEditing] = useState(false);
+  const [originalForm, setOriginalForm] = useState(null);
   const [form, setForm] = useState({
     titre: "",
     auteur: "",
@@ -22,6 +26,14 @@ export default function EditChant() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [user, setUser] = useState(null);
+  
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   useEffect(() => {
     async function fetchChant() {
@@ -34,7 +46,7 @@ export default function EditChant() {
         const categoriesStr = data.categories ? data.categories.join(", ") : "";
         const structureArray = Array.isArray(data.structure) ? data.structure : [];
 
-        setForm({
+        const formData = {
           titre: data.titre || "",
           auteur: data.auteur || "",
           langue: data.langue || "",
@@ -46,7 +58,9 @@ export default function EditChant() {
             audio_mp3: data.fichiers?.audio_mp3 || "",
             video_youtube: data.fichiers?.video_youtube || "",
           },
-        });
+        };
+        setForm(formData);
+        setOriginalForm(JSON.parse(JSON.stringify(formData)));
         setError(null);
       } catch (err) {
         setError("Erreur lors du chargement du chant");
@@ -80,25 +94,48 @@ export default function EditChant() {
     });
   };
 
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    if (originalForm) {
+      setForm(JSON.parse(JSON.stringify(originalForm)));
+    }
+    setIsEditing(false);
+    setError(null);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
-
       const categoriesArr = form.categories
         .split(",")
         .map((s) => s.trim())
         .filter((s) => s.length > 0);
 
-      await api.put(`/api/chants/${Idchant}`, {
+      const res = await api.put(`/api/chants/${Idchant}`, {
         ...form,
         categories: categoriesArr,
       });
 
-      alert("Chant modifié avec succès !");
-      navigate("/showChants");
+      // Mettre à jour originalForm avec les nouvelles données
+      const updatedForm = {
+        ...form,
+        categories: form.categories, // Garder la chaîne originale
+      };
+      setOriginalForm(JSON.parse(JSON.stringify(updatedForm)));
+
+      // Utiliser un toast au lieu d'alert
+      if (window.showToast) {
+        window.showToast("Chant modifié avec succès !", "success");
+      } else {
+        alert("Chant modifié avec succès !");
+      }
+      setIsEditing(false);
     } catch (err) {
       setError("Erreur lors de la sauvegarde");
       console.error(err);
@@ -107,142 +144,217 @@ export default function EditChant() {
     }
   };
 
-  return (<>
-      <header className="bg-white shadow-md top-0 left-0 position-sticky z-10">
-        <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between p-4">
-          <div className="flex items-center mb-3 sm:mb-0">
-             <Link to={"/showChants"}><img
-              src={logo_PraiseApp} 
-              alt="logo_PraiseApp"
-              className="h-20 w-20 mr-3"
-            /></Link>
-            {/* Petit écran - titre à côté */}
-            <h1 className="text-2xl font-bold text-gray-700 sm:hidden">
-              Modifier le Chant
-            </h1>
-          </div>
-          {/* Titre central sur écrans moyens et plus */}
-          <h1 className="hidden sm:block text-3xl font-bold text-center text-gray-700 flex-grow">
-         Modifier le Chant
-          </h1>
-    
-          {/* Bouton déconnexion */}
-          <button
-             onClick={()=>handleLogout(navigate)}
-            className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-lg transition w-full sm:w-auto mt-3 sm:mt-0"
-          >
-            Déconnexion
-          </button>
-        </div>
-      </header>
-    <div className="max-w-4xl mx-auto p-8 bg-white rounded-xl shadow-lg mt-12 mb-12">
-
-      {error && <p className="text-red-600 mb-4 text-center">{error}</p>}
-      {loading && <p className="text-center mb-4">Chargement...</p>}
-
-      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-        {["titre", "auteur", "langue", "categories", "rythme"].map((key) => (
-          <input
-            key={key}
-            type="text"
-            placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
-            className="border p-3 rounded-lg w-full text-lg"
-            value={form[key]}
-            onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-            required={key === "titre"}
-          />
-        ))}
-
-        {/* Structure du chant */}
-        <div className="border-t pt-4 mt-4">
-          <h3 className="font-semibold text-2xl mb-4">Structure</h3>
-          {form.structure.map((part, index) => (
-            <div
-              key={index}
-              className="flex flex-col sm:flex-row gap-3 mb-4 items-center"
-            >
-              <select
-                className="border p-2 rounded-lg w-full sm:w-1/4"
-                value={part.type}
-                onChange={(e) => updatePart(index, "type", e.target.value)}
-              >
-                <option value="couplet">Couplet</option>
-                <option value="refrain">Refrain</option>
-                <option value="solo">Solo</option>
-                <option value="ass">Ass</option>
-                <option value="autre">Autre</option>
-              </select>
-              <input
-                type="number"
-                min="1"
-                className="border p-2 rounded-lg w-full sm:w-1/6"
-                value={part.numero}
-                onChange={(e) =>
-                  updatePart(index, "numero", parseInt(e.target.value) || 1)
-                }
-              />
-              <textarea
-                type="text"
-                placeholder="Contenu"
-                className="border p-2 rounded-lg w-full sm:w-2/3"
-                value={part.contenu}
-                onChange={(e) => updatePart(index, "contenu", e.target.value)}
-              />
-              <button
-                type="button"
-                onClick={() => removePart(index)}
-                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg mt-2 sm:mt-0"
-              >
-                Supprimer
-              </button>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-50 to-yellow-50">
+      <Header user={user} navigate={navigate} titre="Modifier le Chant" />
+      
+      <main className="container mx-auto p-6 sm:p-8 md:p-10 max-w-4xl">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-6 sm:p-8 md:p-10 border border-white/20">
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm text-center animate-fadeIn">
+              {error}
             </div>
-          ))}
-          <button
-            type="button"
-            onClick={addPart}
-            className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg"
-          >
-            + Ajouter une partie
-          </button>
-        </div>
+          )}
+          {loading && (
+            <div className="mb-4 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-4 border-b-4 border-blue-800 mx-auto mb-2"></div>
+              <p className="text-gray-600">Chargement...</p>
+            </div>
+          )}
 
-        {/* Fichiers */}
-        <div className="border-t pt-4 mt-6">
-          <h3 className="font-semibold text-2xl mb-4">Fichiers</h3>
-          {Object.entries(form.fichiers).map(([key, val]) => (
-            <input
-              key={key}
-              type="text"
-              placeholder={`URL ${key.replace("_", " ").toUpperCase()}`}
-              className="border p-3 rounded-lg w-full mb-4"
-              value={val}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  fichiers: { ...form.fichiers, [key]: e.target.value },
-                })
-              }
-            />
-          ))}
-        </div>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-800 via-blue-700 to-orange-500 bg-clip-text text-transparent">
+              Détails du Chant
+            </h2>
+            {!isEditing ? (
+              <Button
+                type="button"
+                variant="primary"
+                onClick={handleEdit}
+                className="flex items-center gap-2"
+              >
+                <Edit className="w-4 h-4" />
+                Modifier
+              </Button>
+            ) : (
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={handleCancel}
+                  className="flex items-center gap-2"
+                >
+                  <XCircle className="w-4 h-4" />
+                  Annuler
+                </Button>
+              </div>
+            )}
+          </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className={`${
-            loading ? "bg-blue-300" : "bg-blue-600 hover:bg-blue-700"
-          } text-white font-semibold px-6 py-3 rounded-lg transition`}
-        >
-          {loading ? "Enregistrement..." : "Enregistrer"}
-        </button>
-         <button
-              type="button"
-              onClick={() => navigate(-1)}
-              className="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-lg flex-1"
-            >
-              Annuler
-            </button>
-      </form>
-    </div></>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            {["titre", "auteur", "categories", "rythme"].map((key) => (
+              <div key={key}>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {key.charAt(0).toUpperCase() + key.slice(1)}
+                </label>
+                <input
+                  type="text"
+                  placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
+                  className={`w-full border-2 p-3 rounded-xl transition-all ${
+                    isEditing
+                      ? "border-gray-200 focus:outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-200 bg-white"
+                      : "border-transparent bg-gray-50 cursor-not-allowed"
+                  }`}
+                  value={form[key]}
+                  onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                  disabled={!isEditing}
+                  required={key === "titre"}
+                />
+              </div>
+            ))}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Langue
+              </label>
+              {isEditing ? (
+                <LanguageSelect
+                  value={form.langue}
+                  onChange={(lang) => setForm({ ...form, langue: lang })}
+                />
+              ) : (
+                <div className="w-full border-2 border-transparent bg-gray-50 p-3 rounded-xl text-gray-800">
+                  {form.langue || "Non spécifiée"}
+                </div>
+              )}
+            </div>
+
+            {/* Structure du chant */}
+            <div className="border-t border-gray-200 pt-5 mt-2">
+              <h3 className="font-semibold text-lg mb-4 text-gray-800">Structure du chant</h3>
+              {form.structure.map((part, index) => (
+                <div
+                  key={index}
+                  className="flex flex-col sm:flex-row gap-3 mb-4 p-4 bg-gray-50 rounded-xl border border-gray-200"
+                >
+                  <select
+                    className={`border-2 p-2 rounded-xl w-full sm:w-1/4 mb-2 sm:mb-0 ${
+                      isEditing
+                        ? "border-gray-200 focus:outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-200 bg-white"
+                        : "border-transparent bg-gray-50 cursor-not-allowed"
+                    }`}
+                    value={part.type}
+                    onChange={(e) => updatePart(index, "type", e.target.value)}
+                    disabled={!isEditing}
+                  >
+                    <option value="couplet">Couplet</option>
+                    <option value="refrain">Refrain</option>
+                    <option value="solo">Solo</option>
+                    <option value="ass">Ass</option>
+                    <option value="autre">Autre</option>
+                  </select>
+                  <input
+                    type="number"
+                    min="1"
+                    className={`border-2 p-2 rounded-xl w-full sm:w-1/6 mb-2 sm:mb-0 ${
+                      isEditing
+                        ? "border-gray-200 focus:outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-200 bg-white"
+                        : "border-transparent bg-gray-50 cursor-not-allowed"
+                    }`}
+                    value={part.numero}
+                    onChange={(e) =>
+                      updatePart(index, "numero", parseInt(e.target.value) || 1)
+                    }
+                    disabled={!isEditing}
+                  />
+                  <textarea
+                    placeholder="Contenu"
+                    rows="3"
+                    className={`border-2 p-2 rounded-xl w-full sm:w-2/3 mb-2 sm:mb-0 resize-none ${
+                      isEditing
+                        ? "border-gray-200 focus:outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-200 bg-white"
+                        : "border-transparent bg-gray-50 cursor-not-allowed"
+                    }`}
+                    value={part.contenu}
+                    onChange={(e) => updatePart(index, "contenu", e.target.value)}
+                    disabled={!isEditing}
+                  />
+                  {isEditing && (
+                    <button
+                      type="button"
+                      onClick={() => removePart(index)}
+                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-xl transition-all shadow-md hover:shadow-lg sm:self-center flex items-center justify-center"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              ))}
+              {isEditing && (
+                <button
+                  type="button"
+                  onClick={addPart}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Ajouter une partie
+                </button>
+              )}
+            </div>
+
+            {/* Fichiers */}
+            <div className="border-t border-gray-200 pt-5 mt-2">
+              <h3 className="font-semibold text-lg mb-4 text-gray-800">Fichiers (URLs)</h3>
+              {Object.entries(form.fichiers).map(([key, val]) => (
+                <div key={key} className="mb-3">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {key.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())}
+                  </label>
+                  <input
+                    type="text"
+                    placeholder={`URL ${key.replace("_", " ").toUpperCase()}`}
+                    className={`w-full border-2 p-3 rounded-xl transition-all ${
+                      isEditing
+                        ? "border-gray-200 focus:outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-200 bg-white"
+                        : "border-transparent bg-gray-50 cursor-not-allowed"
+                    }`}
+                    value={val}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        fichiers: { ...form.fichiers, [key]: e.target.value },
+                      })
+                    }
+                    disabled={!isEditing}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Boutons */}
+            {isEditing && (
+              <div className="flex gap-3 mt-6 pt-4 border-t border-gray-200">
+                <Button
+                  type="submit"
+                  variant="primary"
+                  disabled={loading}
+                  className="flex-1 flex items-center justify-center gap-2"
+                >
+                  <Save className="w-4 h-4" />
+                  {loading ? "Enregistrement..." : "Enregistrer"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={handleCancel}
+                  className="flex-1"
+                >
+                  Annuler
+                </Button>
+              </div>
+            )}
+          </form>
+        </div>
+      </main>
+    </div>
   );
 }
