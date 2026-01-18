@@ -7,7 +7,7 @@ export async function getChants(req, res) {
 }
 
 export async function getChantById(req, res) {
-  const chant = await Chant.findById(req.params.id);
+  const chant = await Chant.findById(req.params.id).populate("ajoute_par", "nom email").populate("modifie_par", "nom email");
   if (!chant) return res.status(404).json({ message: "Chant introuvable" });
   res.json(chant);
 }
@@ -22,13 +22,24 @@ export async function createChant(req, res) {
 }
 
 export async function updateChant(req, res) {
-  const chant = await Chant.findByIdAndUpdate(
-    req.params.id, 
-    { ...req.body, date_mise_a_jour: new Date() }, 
-    { new: true }
-  );
-  if (!chant) return res.status(404).json({ message: "Chant introuvable" });
-  res.json(chant);
+  try {
+    const updateData = {
+      ...req.body,
+      date_mise_a_jour: new Date(),
+      modifie_par: req.user?.id || null
+    };
+    
+    const chant = await Chant.findByIdAndUpdate(
+      req.params.id, 
+      updateData, 
+      { new: true }
+    ).populate("ajoute_par", "nom email").populate("modifie_par", "nom email");
+    
+    if (!chant) return res.status(404).json({ message: "Chant introuvable" });
+    res.json(chant);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 }
 
 export async function deleteChant(req, res) {

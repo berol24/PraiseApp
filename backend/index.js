@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import usersRoutes from "./routes/users.js";
 import chantsRoutes from "./routes/chants.js";
+import feedbackRoutes from "./routes/feedback.js";
 
 dotenv.config();
 const PORT = process.env.PORT || 5000;
@@ -43,5 +44,6 @@ mongoose
 app.use("/api", authRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/chants", chantsRoutes);
+app.use("/api/feedback", feedbackRoutes);
 
 app.listen(PORT, () => console.log(`🚀 Serveur backend sur http://localhost:${PORT}`));

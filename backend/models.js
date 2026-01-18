@@ -35,7 +35,16 @@ const ChantSchema = new mongoose.Schema({
     video_youtube: { type: String }
   },
   ajoute_par: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  modifie_par: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   date_creation: { type: Date, default: Date.now },
   date_mise_a_jour: { type: Date, default: Date.now }
 });
 export const Chant = mongoose.model("Chant", ChantSchema);
+
+/* === Schéma Feedback/Avis === */
+const FeedbackSchema = new mongoose.Schema({
+  nom: { type: String, required: true },
+  message: { type: String, required: true },
+  date_creation: { type: Date, default: Date.now }
+});
+export const Feedback = mongoose.model("Feedback", FeedbackSchema);
