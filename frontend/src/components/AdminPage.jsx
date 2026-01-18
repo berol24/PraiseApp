@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Users, Search, Edit, Trash2, Filter } from "lucide-react";
+import { Users, Search, Edit, Trash2, Filter, MessageSquare, X } from "lucide-react";
 import Header from "./Header";
 import { Link, useNavigate } from "react-router-dom";
 import { formatDate } from "../utils/FormatDate";
 import { handleDeleteUser } from "../services/HandleDeleteUser";
 import api from "../services/api";
 import ConfirmModal from "./common/ConfirmModal";
+import Modal from "./common/Modal";
+import { toast } from "../services/toast";
 
 function AdminPage() {
   const [user, setUser] = useState(null);
@@ -14,15 +16,10 @@ function AdminPage() {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [roleFilter, setRoleFilter] = useState("all");
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, userId: null, userName: "" });
+  const [showFeedbacksModal, setShowFeedbacksModal] = useState(false);
+  const [feedbacks, setFeedbacks] = useState([]);
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (!storedUser) return navigate("/login");
-    setUser(JSON.parse(storedUser));
-    fetchUsers();
-  }, [navigate]);
 
   const fetchUsers = async () => {
     try {
@@ -31,6 +28,40 @@ function AdminPage() {
     } catch (err) {
       console.error("Erreur lors du chargement des chants", err);
     }
+  };
+
+  const fetchFeedbacks = async () => {
+    try {
+      const res = await api.get("/api/feedback/all");
+      setFeedbacks(res.data);
+    } catch (err) {
+      console.error("Erreur lors du chargement des avis", err);
+      toast("Erreur lors du chargement des avis", "error");
+    }
+  };
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (!storedUser) return navigate("/login");
+    setUser(JSON.parse(storedUser));
+    fetchUsers();
+    fetchFeedbacks();
+  }, [navigate]);
+
+  const handleDeleteFeedback = async (id) => {
+    try {
+      await api.delete(`/api/feedback/${id}`);
+      toast("Avis supprimé avec succès", "success");
+      fetchFeedbacks();
+    } catch (err) {
+      console.error("Erreur lors de la suppression de l'avis", err);
+      toast("Erreur lors de la suppression de l'avis", "error");
+    }
+  };
+
+  const handleOpenFeedbacks = () => {
+    setShowFeedbacksModal(true);
+    fetchFeedbacks();
   };
 
   //  Filtrage automatique à chaque saisie et par rôle
@@ -55,6 +86,17 @@ function AdminPage() {
       <Header navigate={navigate} user={user} titre="Gestion des utilisateurs"/>
       
       <main className="container mx-auto p-6 sm:p-8 md:p-10 max-w-7xl">
+        {/* Bouton pour voir les avis */}
+        <div className="mb-6">
+          <button
+            onClick={handleOpenFeedbacks}
+            className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-3 px-6 rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 flex items-center gap-2"
+          >
+            <MessageSquare className="w-5 h-5" />
+            Voir les avis ({feedbacks.length})
+          </button>
+        </div>
+
         {/* Statistiques */}
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
           <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-white/20 shadow-lg">
@@ -245,6 +287,56 @@ function AdminPage() {
         cancelText="Annuler"
         variant="danger"
       />
+
+      {/* Modal pour afficher les avis */}
+      <Modal
+        isOpen={showFeedbacksModal}
+        onClose={() => setShowFeedbacksModal(false)}
+        title="Avis des utilisateurs"
+        size="xl"
+      >
+        <div className="max-h-[70vh] overflow-y-auto">
+          {feedbacks.length > 0 ? (
+            <div className="space-y-4">
+              {feedbacks.map((feedback) => (
+                <div
+                  key={feedback._id}
+                  className="bg-gradient-to-br from-blue-50 to-yellow-50 rounded-xl p-5 border border-blue-200 shadow-md"
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-700 via-blue-800 to-orange-500 rounded-full flex items-center justify-center text-white font-bold">
+                          {feedback.nom[0]?.toUpperCase() || "?"}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-800">{feedback.nom}</p>
+                        </div>
+                      </div>
+                      <p className="text-gray-700 mt-3 whitespace-pre-wrap">{feedback.message}</p>
+                      <p className="text-xs text-gray-500 mt-2">
+                        {formatDate(feedback.date_creation)}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteFeedback(feedback._id)}
+                      className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-all shadow-md hover:shadow-lg"
+                      title="Supprimer cet avis"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <MessageSquare className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+              <p className="text-lg font-semibold text-gray-700">Aucun avis pour le moment</p>
+            </div>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 }

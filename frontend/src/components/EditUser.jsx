@@ -3,11 +3,21 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
 import { toast } from "../services/toast";
+import Header from "./Header";
+
 function EditUser() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const { IdUser } = useParams();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   const [form, setForm] = useState({
     nom: "",
@@ -76,7 +86,9 @@ function EditUser() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-8 bg-white rounded-xl shadow-lg mt-12 mb-12">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-blue-50 to-yellow-50">
+      <Header user={user} titre="Modifier l'utilisateur" />
+      <div className="max-w-4xl mx-auto p-6 sm:p-8 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg mt-6 sm:mt-12 mb-12">
       {error && <p className="text-red-600 mb-4 text-center">{error}</p>}
       {loading && <p className="text-center mb-4">Chargement...</p>}
 
@@ -181,6 +193,7 @@ function EditUser() {
           </div>
         </div>
       </form>
+      </div>
     </div>
   );
 }

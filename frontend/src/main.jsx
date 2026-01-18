@@ -31,7 +31,7 @@ const router = createBrowserRouter(
       <Route path="login" element={<Login />} />
       <Route path="register" element={<Register />} />
       <Route path="showChants" element={<RequireAuth><ShowChant /></RequireAuth>} />
-      <Route path="showChants/:Idchant" element={<RequireAuth><ShowDetailChant /></RequireAuth>} />
+      <Route path="showChants/:Idchant" element={<ShowDetailChant />} />
       <Route path="editChant/:Idchant" element={<RequireAuth><EditChant /></RequireAuth>} />
       <Route path="admin" element={<RequireAuth><AdminPage /></RequireAuth>} />
       <Route path="editUser/:IdUser" element={<RequireAuth><EditUser /></RequireAuth>} />

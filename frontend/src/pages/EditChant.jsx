@@ -6,6 +6,7 @@ import Header from "../components/Header";
 import Button from "../components/common/Button";
 import LanguageSelect from "../components/common/LanguageSelect";
 import { toast } from "../services/toast";
+import { formatDate } from "../utils/FormatDate";
 
 export default function EditChant() {
   const { Idchant } = useParams();
@@ -24,6 +25,9 @@ export default function EditChant() {
       audio_mp3: "",
       video_youtube: "",
     },
+    date_creation: null,
+    date_mise_a_jour: null,
+    modifie_par: null,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -59,6 +63,9 @@ export default function EditChant() {
             audio_mp3: data.fichiers?.audio_mp3 || "",
             video_youtube: data.fichiers?.video_youtube || "",
           },
+          date_creation: data.date_creation,
+          date_mise_a_jour: data.date_mise_a_jour,
+          modifie_par: data.modifie_par,
         };
         setForm(formData);
         setOriginalForm(JSON.parse(JSON.stringify(formData)));
@@ -118,17 +125,36 @@ export default function EditChant() {
         .map((s) => s.trim())
         .filter((s) => s.length > 0);
 
-      const res = await api.put(`/api/chants/${Idchant}`, {
+      await api.put(`/api/chants/${Idchant}`, {
         ...form,
         categories: categoriesArr,
       });
 
-      // Mettre à jour originalForm avec les nouvelles données
-      const updatedForm = {
-        ...form,
-        categories: form.categories, // Garder la chaîne originale
+      // Recharger les données depuis le serveur pour obtenir modifie_par avec le nom
+      const res = await api.get(`/api/chants/${Idchant}`);
+      const data = res.data;
+      const categoriesStr = data.categories ? data.categories.join(", ") : "";
+      const structureArray = Array.isArray(data.structure) ? data.structure : [];
+
+      const updatedFormData = {
+        titre: data.titre || "",
+        auteur: data.auteur || "",
+        langue: data.langue || "",
+        categories: categoriesStr,
+        rythme: data.rythme || "",
+        structure: structureArray,
+        fichiers: {
+          partition_pdf: data.fichiers?.partition_pdf || "",
+          audio_mp3: data.fichiers?.audio_mp3 || "",
+          video_youtube: data.fichiers?.video_youtube || "",
+        },
+        date_creation: data.date_creation,
+        date_mise_a_jour: data.date_mise_a_jour,
+        modifie_par: data.modifie_par,
       };
-      setOriginalForm(JSON.parse(JSON.stringify(updatedForm)));
+      
+      setForm(updatedFormData);
+      setOriginalForm(JSON.parse(JSON.stringify(updatedFormData)));
 
       toast("Chant modifié avec succès !", "success");
       setIsEditing(false);
@@ -186,6 +212,23 @@ export default function EditChant() {
               </div>
             )}
           </div>
+
+          {/* Informations de modification - visible uniquement pour les admins */}
+          {user?.role === "admin" && (
+            <div className="mb-6 p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl border border-blue-200">
+              <div className="text-sm text-gray-600 flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-4">
+                <span>
+                  <span className="font-semibold">Créé le :</span> {form.date_creation ? formatDate(form.date_creation) : "Non spécifié"}
+                </span>
+                <span>
+                  <span className="font-semibold">Mis à jour le :</span> {form.date_mise_a_jour ? formatDate(form.date_mise_a_jour) : "Non spécifié"}
+                  {form.modifie_par?.nom && (
+                    <span className="ml-2 text-blue-700 font-semibold">par {form.modifie_par.nom}</span>
+                  )}
+                </span>
+              </div>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             {["titre", "auteur", "categories", "rythme"].map((key) => (

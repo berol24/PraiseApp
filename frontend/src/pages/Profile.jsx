@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { User, Mail, Lock, Trash2, Save, X, Edit, XCircle } from "lucide-react";
 import Header from "../components/Header";
 import Button from "../components/common/Button";
-import Modal from "../components/common/Modal";
+import ConfirmModal from "../components/common/ConfirmModal";
 import api from "../services/api";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Profile() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [user, setUser] = useState(null);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isEditingPassword, setIsEditingPassword] = useState(false);
@@ -122,6 +124,8 @@ export default function Profile() {
       await api.delete(`/api/users/${user._id}`);
       localStorage.removeItem("user");
       localStorage.removeItem("token");
+      logout(false); // Déconnexion sans redirection automatique
+      setShowDeleteModal(false);
       navigate("/login");
     } catch (err) {
       setError(err.response?.data?.message || "Erreur lors de la suppression");
@@ -347,35 +351,16 @@ export default function Profile() {
         </div>
       </main>
 
-      <Modal
+      <ConfirmModal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
-        title="Confirmer la suppression"
-        size="sm"
-      >
-        <div className="space-y-4">
-          <p className="text-gray-700">
-            Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.
-          </p>
-          <div className="flex gap-3">
-            <Button
-              variant="danger"
-              onClick={handleDelete}
-              disabled={loading}
-              className="flex-1"
-            >
-              {loading ? "Suppression..." : "Supprimer"}
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => setShowDeleteModal(false)}
-              className="flex-1"
-            >
-              Annuler
-            </Button>
-          </div>
-        </div>
-      </Modal>
+        onConfirm={handleDelete}
+        title="Supprimer mon compte"
+        message="Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible et toutes vos données seront perdues."
+        confirmText={loading ? "Suppression..." : "Oui, supprimer"}
+        cancelText="Annuler"
+        variant="danger"
+      />
     </div>
   );
 }
