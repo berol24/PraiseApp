@@ -2,14 +2,39 @@ import mongoose from "mongoose";
 import { Chant, User } from "../models.js";
 
 export async function getChants(req, res) {
-  const chants = await Chant.find().populate("ajoute_par", "nom email");
-  res.json(chants);
+  try {
+    // Vérifier la connexion MongoDB
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({ 
+        message: "Service temporairement indisponible. Reconnexion à la base de données en cours..." 
+      });
+    }
+    const chants = await Chant.find().populate("ajoute_par", "nom email");
+    res.json(chants);
+  } catch (err) {
+    console.error("Erreur getChants:", err);
+    res.status(500).json({ 
+      message: err.message || "Erreur lors de la récupération des chants" 
+    });
+  }
 }
 
 export async function getChantById(req, res) {
-  const chant = await Chant.findById(req.params.id).populate("ajoute_par", "nom email").populate("modifie_par", "nom email");
-  if (!chant) return res.status(404).json({ message: "Chant introuvable" });
-  res.json(chant);
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({ 
+        message: "Service temporairement indisponible. Reconnexion à la base de données en cours..." 
+      });
+    }
+    const chant = await Chant.findById(req.params.id).populate("ajoute_par", "nom email").populate("modifie_par", "nom email");
+    if (!chant) return res.status(404).json({ message: "Chant introuvable" });
+    res.json(chant);
+  } catch (err) {
+    console.error("Erreur getChantById:", err);
+    res.status(500).json({ 
+      message: err.message || "Erreur lors de la récupération du chant" 
+    });
+  }
 }
 
 export async function createChant(req, res) {
