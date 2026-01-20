@@ -14,7 +14,8 @@ function ShowDetailChant() {
   const [user, setUser] = useState(null);
   const structure = mesChants ? mesChants.structure : [];
   const titre = mesChants ? mesChants.titre : "";
-  const sortedStructure = [...structure].sort((a, b) => a.numero - b.numero);
+  // Utiliser l'ordre de saisie (ordre du tableau) au lieu de trier par numéro
+  const sortedStructure = structure; // Conserver l'ordre original
   
   // Récupérer le rôle de l'utilisateur pour vérifier s'il est admin
   useEffect(() => {
@@ -224,7 +225,7 @@ function ShowDetailChant() {
             {/* BOUTONS GLOBAUX */}
             <div className="pt-4 border-t border-gray-200 space-y-3">
               <button
-                onClick={()=>handleDownloadPDF (mesChants,sortedStructure)}
+                onClick={()=>handleDownloadPDF (mesChants, structure)}
                 className="w-full bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
               >
                 <Download className="w-4 h-4" />
@@ -232,14 +233,14 @@ function ShowDetailChant() {
               </button>
               <button
                 onClick={() => {
-                  const messagesortedStructure = sortedStructure
+                  const messageStructure = structure
                     .map(
                       ({ type, numero, contenu }) =>
                         `${type} ${numero}\n${contenu}`
                     )
                     .join("\n\n");
 
-                  const message = `Voici les paroles du chant "${titre}" :\n\n${messagesortedStructure}`;
+                  const message = `Voici les paroles du chant "${titre}" :\n\n${messageStructure}`;
                   const encodedMessage = encodeURIComponent(message);
                   const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
                   window.open(whatsappUrl, "_blank");
@@ -260,19 +261,22 @@ function ShowDetailChant() {
           </h2>
 
           <div className="space-y-4 sm:space-y-6">
-            {sortedStructure.map(({ _id, type, numero, contenu }) => (
-              <div key={_id} className="bg-white/80 backdrop-blur-sm rounded-xl p-4 sm:p-5 border-l-4 border-blue-700 shadow-md hover:shadow-lg transition-all">
-                <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-800 via-blue-700 to-orange-500 bg-clip-text text-transparent mb-2 sm:mb-3 capitalize">
-                  {type} {numero}
-                </h3>
-                <p 
-                  className="whitespace-pre-line text-gray-700 leading-relaxed break-words"
-                  style={{ fontSize: `${fontSize}px` }}
-                >
-                  {contenu}
-                </p>
-              </div>
-            ))}
+            {structure.map((part, index) => {
+              const { _id, type, numero, contenu } = part;
+              return (
+                <div key={_id || index} className="bg-white/80 backdrop-blur-sm rounded-xl p-4 sm:p-5 border-l-4 border-blue-700 shadow-md hover:shadow-lg transition-all">
+                  <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-800 via-blue-700 to-orange-500 bg-clip-text text-transparent mb-2 sm:mb-3 capitalize">
+                    {type} {numero}
+                  </h3>
+                  <p 
+                    className="whitespace-pre-line text-gray-700 leading-relaxed break-words"
+                    style={{ fontSize: `${fontSize}px` }}
+                  >
+                    {contenu}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
         </div>

@@ -36,9 +36,8 @@ export default function AddChant({ onClose, onAdded }) {
 
   /** Supprimer une partie */
   const removePart = (index) => {
-    const updated = form.structure
-      .filter((_, i) => i !== index)
-      .map((part, i) => ({ ...part, numero: i + 1 }));
+    const updated = form.structure.filter((_, i) => i !== index);
+    // Ne pas réassigner les numéros pour préserver l'ordre de saisie
     setForm({ ...form, structure: updated });
   };
 

@@ -1,6 +1,6 @@
 import { jsPDF } from "jspdf";  
   
-  export const handleDownloadPDF = (mesChants,sortedStructure) => {
+  export const handleDownloadPDF = (mesChants, structure) => {
     const doc = new jsPDF({
       orientation: "portrait",
       unit: "mm",
@@ -68,7 +68,7 @@ import { jsPDF } from "jspdf";
 
     const lineHeight = 8;
 
-    sortedStructure.forEach(({ type, numero, contenu }) => {
+    structure.forEach(({ type, numero, contenu }) => {
       if (y > 270) {
         doc.addPage();
         y = margin;
