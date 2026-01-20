@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { X, Plus, Edit, Save, XCircle } from "lucide-react";
+import { X, Plus, Edit, Save, XCircle, AlertCircle } from "lucide-react";
 import api from "../services/api";
 import Header from "../components/Header";
 import Button from "../components/common/Button";
 import LanguageSelect from "../components/common/LanguageSelect";
 import { toast } from "../services/toast";
 import { formatDate } from "../utils/FormatDate";
+import { formatError, isOnline } from "../utils/errorFormatter";
 
 export default function EditChant() {
   const { Idchant } = useParams();
@@ -71,7 +72,8 @@ export default function EditChant() {
         setOriginalForm(JSON.parse(JSON.stringify(formData)));
         setError(null);
       } catch (err) {
-        setError("Erreur lors du chargement du chant");
+        const errorMessage = formatError(err);
+        setError(errorMessage);
         console.error(err);
       } finally {
         setLoading(false);
@@ -159,7 +161,8 @@ export default function EditChant() {
       toast("Chant modifié avec succès !", "success");
       setIsEditing(false);
     } catch (err) {
-      setError("Erreur lors de la sauvegarde");
+      const errorMessage = formatError(err);
+      setError(errorMessage);
       console.error(err);
     } finally {
       setLoading(false);
@@ -173,8 +176,11 @@ export default function EditChant() {
       <main className="container mx-auto p-6 sm:p-8 md:p-10 max-w-4xl">
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-6 sm:p-8 md:p-10 border border-white/20">
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm text-center animate-fadeIn">
-              {error}
+            <div className="mb-4 p-4 bg-red-50 border-2 border-red-500 rounded-xl text-red-700 text-sm animate-fadeIn">
+              <div className="flex items-center justify-center gap-2">
+                <AlertCircle className="w-5 h-5 text-red-600" />
+                <span className="font-medium">{error}</span>
+              </div>
             </div>
           )}
           {loading && (

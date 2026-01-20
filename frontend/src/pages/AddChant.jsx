@@ -1,12 +1,13 @@
 
 
 import React, { useState } from "react";
-import { X, Plus } from "lucide-react";
+import { X, Plus, AlertCircle } from "lucide-react";
 import api from "../services/api";
 import Modal from "../components/common/Modal";
 import Button from "../components/common/Button";
 import LanguageSelect from "../components/common/LanguageSelect";
 import { toast } from "../services/toast";
+import { formatError, isOnline } from "../utils/errorFormatter";
 
 export default function AddChant({ onClose, onAdded }) {
   const [form, setForm] = useState({
@@ -55,6 +56,11 @@ export default function AddChant({ onClose, onAdded }) {
 
     if (!form.titre.trim()) return setError("Le titre est obligatoire");
 
+    if (!isOnline()) {
+      setError("Vous êtes hors ligne. Veuillez vérifier votre connexion Internet.");
+      return;
+    }
+
     try {
       setLoading(true);
       const data = {
@@ -70,7 +76,8 @@ export default function AddChant({ onClose, onAdded }) {
       onAdded();
       onClose();
     } catch (err) {
-      setError(err.response?.data?.message || "Erreur lors de l'ajout du chant");
+      const errorMessage = formatError(err);
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -79,8 +86,11 @@ export default function AddChant({ onClose, onAdded }) {
   return (
     <Modal isOpen={true} onClose={onClose} title="Ajouter un Chant" size="xl">
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm text-center animate-fadeIn">
-          {error}
+        <div className="mb-4 p-4 bg-red-50 border-2 border-red-500 rounded-xl text-red-700 text-sm animate-fadeIn">
+          <div className="flex items-center justify-center gap-2">
+            <AlertCircle className="w-5 h-5 text-red-600" />
+            <span className="font-medium">{error}</span>
+          </div>
         </div>
       )}
 

@@ -10,7 +10,7 @@ export default defineConfig({
       manifest: {
         name: 'PraiseApp',
         short_name: 'PraiseApp',
-        description: "PraiseApp est une application moderne de gestion et de partage de chants. Elle permet aux utilisateurs d’ajouter, consulter et gérer facilement des chants en ligne grâce à une interface fluide et intuitive.",
+        description: "PraiseApp est une application moderne de gestion et de partage de chants. Elle permet aux utilisateurs d'ajouter, consulter et gérer facilement des chants en ligne grâce à une interface fluide et intuitive.",
         theme_color: '#ffffff',
         background_color: '#ffffff',
         display: 'standalone',
@@ -34,5 +34,14 @@ export default defineConfig({
       }
     }),
   ],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      }
+    }
+  }
 })
 

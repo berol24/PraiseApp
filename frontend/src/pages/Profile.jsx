@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Mail, Lock, Trash2, Save, X, Edit, XCircle } from "lucide-react";
+import { User, Mail, Lock, Trash2, Save, X, Edit, XCircle, AlertCircle } from "lucide-react";
 import Header from "../components/Header";
 import Button from "../components/common/Button";
 import ConfirmModal from "../components/common/ConfirmModal";
 import api from "../services/api";
 import { useAuth } from "../hooks/useAuth";
+import { formatError, isOnline } from "../utils/errorFormatter";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -84,7 +85,8 @@ export default function Profile() {
       setSuccess("Profil mis à jour avec succès !");
       setIsEditingProfile(false);
     } catch (err) {
-      setError(err.response?.data?.message || "Erreur lors de la mise à jour");
+      const errorMessage = formatError(err);
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -112,7 +114,8 @@ export default function Profile() {
       setIsEditingPassword(false);
       setForm({ ...form, mot_de_passe: "", confirmPassword: "" });
     } catch (err) {
-      setError(err.response?.data?.message || "Erreur lors de la mise à jour");
+      const errorMessage = formatError(err);
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -128,7 +131,8 @@ export default function Profile() {
       setShowDeleteModal(false);
       navigate("/login");
     } catch (err) {
-      setError(err.response?.data?.message || "Erreur lors de la suppression");
+      const errorMessage = formatError(err);
+      setError(errorMessage);
       setLoading(false);
       setShowDeleteModal(false);
     }
@@ -161,8 +165,11 @@ export default function Profile() {
           </div>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm animate-fadeIn">
-              {error}
+            <div className="mb-4 p-4 bg-red-50 border-2 border-red-500 rounded-xl text-red-700 text-sm animate-fadeIn">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                <span className="font-medium">{error}</span>
+              </div>
             </div>
           )}
 

@@ -1,8 +1,9 @@
 
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { User, Mail, Lock, UserPlus, Loader2, ArrowRight, Home } from "lucide-react";
+import { User, Mail, Lock, UserPlus, Loader2, ArrowRight, Home, AlertCircle } from "lucide-react";
 import api from "../services/api";
+import { formatError, isOnline } from "../utils/errorFormatter";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -15,11 +16,17 @@ export default function Register() {
     setError("");
     setLoading(true);
     try {
-      if (!navigator.onLine) throw new Error("Vous êtes hors ligne — vérifiez votre connexion");
+      if (!isOnline()) {
+        setError("Vous êtes hors ligne. Veuillez vérifier votre connexion Internet.");
+        setLoading(false);
+        return;
+      }
+      
       await api.post(`/api/register`, form);
       navigate("/login");
     } catch (err) {
-      setError(err.response?.data?.message || err.message || "Erreur lors de l'inscription");
+      const errorMessage = formatError(err);
+      setError(errorMessage);
     } finally { setLoading(false); }
   };
 
@@ -45,8 +52,11 @@ export default function Register() {
           </div>
           
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm text-center animate-fadeIn">
-              {error}
+            <div className="mb-4 p-4 bg-red-50 border-2 border-red-500 rounded-xl text-red-700 text-sm text-center animate-fadeIn">
+              <div className="flex items-center justify-center gap-2">
+                <AlertCircle className="w-5 h-5 text-red-600" />
+                <span className="font-medium">{error}</span>
+              </div>
             </div>
           )}
           

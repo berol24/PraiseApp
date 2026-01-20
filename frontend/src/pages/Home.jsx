@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Music2, Star, Share2, MessageCircle, Mail, Plus, Music, Search, Settings, Share, MessageSquare, Smartphone, Copy, Users, Hash, Menu, X } from "lucide-react";
+import { Music2, Star, Share2, MessageCircle, Mail, Plus, Music, Search, Settings, Share, MessageSquare, Smartphone, Copy, Users, Hash, Menu, X, Loader2, AlertCircle } from "lucide-react";
 import Button from "../components/common/Button";
 import api from "../services/api";
 import { useAuth } from "../hooks/useAuth";
 import AddChant from "./AddChant";
 import Modal from "../components/common/Modal";
 import { toast } from "../services/toast";
+import { formatError, isOnline } from "../utils/errorFormatter";
 
 export default function Home() {
   const { user } = useAuth();
@@ -21,17 +22,61 @@ export default function Home() {
   const [currentFontSize, setCurrentFontSize] = useState(() => parseInt(localStorage.getItem("fontSize") || "16"));
   const [feedbackForm, setFeedbackForm] = useState({ nom: "", message: "" });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const retryCountRef = useRef(0);
+  const maxRetries = 10; // Nombre maximum de tentatives
+  const retryTimeoutRef = useRef(null);
 
   useEffect(() => {
     fetchChants();
+    return () => {
+      // Nettoyer le timeout si le composant est démonté
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
+    };
   }, []);
 
-  const fetchChants = async () => {
+  const fetchChants = async (isRetry = false) => {
     try {
+      setError("");
+      if (!isRetry) {
+        setLoading(true);
+      }
+      
+      // Vérifier la connexion Internet avant de faire la requête
+      if (!isOnline()) {
+        setError("Vous êtes hors ligne. Veuillez vérifier votre connexion Internet.");
+        setLoading(false);
+        return;
+      }
+      
       const res = await api.get("/api/chants");
-      setChants(res.data);
+      setChants(res.data || []);
+      setLoading(false);
+      retryCountRef.current = 0; // Réinitialiser le compteur en cas de succès
     } catch (err) {
       console.error("Erreur lors du chargement des chants", err);
+      
+      // Formater le message d'erreur de manière conviviale
+      const errorMessage = formatError(err);
+      setError(errorMessage);
+      
+      // Retry automatique avec backoff exponentiel (seulement si en ligne)
+      if (isOnline() && retryCountRef.current < maxRetries) {
+        retryCountRef.current += 1;
+        const delay = Math.min(1000 * Math.pow(2, retryCountRef.current - 1), 30000); // Max 30 secondes
+        
+        retryTimeoutRef.current = setTimeout(() => {
+          fetchChants(true);
+        }, delay);
+      } else {
+        setLoading(false);
+        if (!isOnline()) {
+          retryCountRef.current = 0; // Réinitialiser si hors ligne
+        }
+      }
     }
   };
 
@@ -330,9 +375,32 @@ Téléchargez maintenant : ${shareUrl}`;
           </div>
         </div>
 
+        {/* Affichage des erreurs */}
+        {error && !loading && (
+          <div className="mb-6 p-4 bg-red-50 border-2 border-red-500 rounded-xl text-red-700 text-sm text-center animate-fadeIn">
+            <div className="flex items-center justify-center gap-2">
+              <AlertCircle className="w-5 h-5 text-red-600" />
+              <span className="font-medium">{error}</span>
+            </div>
+            {retryCountRef.current > 0 && retryCountRef.current < maxRetries && (
+              <p className="mt-2 text-xs text-red-600">
+                Nouvelle tentative dans quelques instants... ({retryCountRef.current}/{maxRetries})
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Grille des chants */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {filteredChants.length > 0 ? (
+          {loading ? (
+            <div className="col-span-full text-center py-12">
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-white/20">
+                <Loader2 className="w-16 h-16 mx-auto mb-4 text-blue-500 animate-spin" />
+                <p className="text-xl font-semibold text-gray-700 mb-2">Chargement des chants...</p>
+                <p className="text-gray-500">Veuillez patienter</p>
+              </div>
+            </div>
+          ) : filteredChants.length > 0 ? (
             filteredChants.map((c) => (
               <Link to={`/showChants/${c._id}`} key={c._id} className="block group">
                 <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-2xl p-6 flex flex-col justify-between cursor-pointer hover:shadow-2xl transition-all duration-300 border border-white/20 hover:-translate-y-2 h-full">
@@ -357,7 +425,9 @@ Téléchargez maintenant : ${shareUrl}`;
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-white/20">
                 <Music className="w-16 h-16 mx-auto mb-4 text-blue-500" />
                 <p className="text-xl font-semibold text-gray-700 mb-2">Aucun chant trouvé</p>
-                <p className="text-gray-500">Essayez de modifier votre recherche</p>
+                <p className="text-gray-500">
+                  {searchTerm ? "Essayez de modifier votre recherche" : "Aucun chant disponible pour le moment"}
+                </p>
               </div>
             </div>
           )}

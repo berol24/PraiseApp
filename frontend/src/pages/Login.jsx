@@ -1,10 +1,11 @@
 
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Mail, Lock, LogIn, Loader2, ArrowRight, Home } from "lucide-react";
+import { Mail, Lock, LogIn, Loader2, ArrowRight, Home, AlertCircle } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { setToken as saveToken } from "../services/authService";
 import api from "../services/api";
+import { formatError, isOnline } from "../utils/errorFormatter";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -20,7 +21,12 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      if (!navigator.onLine) throw new Error("Vous êtes hors ligne — vérifiez votre connexion");
+      if (!isOnline()) {
+        setError("Vous êtes hors ligne. Veuillez vérifier votre connexion Internet.");
+        setLoading(false);
+        return;
+      }
+      
       const res = await api.post(`/api/login`, form);
       const data = res.data;
       // save token + user in context
@@ -28,7 +34,8 @@ export default function Login() {
       login(data.token, data.user);
       navigate("/showChants");
     } catch (err) {
-      setError(err.response?.data?.message || err.message || "Erreur de connexion");
+      const errorMessage = formatError(err);
+      setError(errorMessage);
       saveToken(null);
     }
     finally { setLoading(false); }
@@ -56,8 +63,11 @@ export default function Login() {
           </div>
           
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm text-center animate-fadeIn">
-              {error}
+            <div className="mb-4 p-4 bg-red-50 border-2 border-red-500 rounded-xl text-red-700 text-sm text-center animate-fadeIn">
+              <div className="flex items-center justify-center gap-2">
+                <AlertCircle className="w-5 h-5 text-red-600" />
+                <span className="font-medium">{error}</span>
+              </div>
             </div>
           )}
           
