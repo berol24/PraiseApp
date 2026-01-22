@@ -1,22 +1,47 @@
-import { jsPDF } from "jspdf";  
-  
-  export const handleDownloadPDF = (mesChants, structure) => {
-    const doc = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4",
+import { jsPDF } from "jspdf";
+
+async function getImageBase64(url) {
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.onerror = reject;
+      r.readAsDataURL(blob);
     });
+  } catch {
+    return null;
+  }
+}
 
-    const margin = 20;
-    let y = margin;
+export const handleDownloadPDF = async (mesChants, structure) => {
+  const doc = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4",
+  });
 
-    // En-tête principale
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(20);
-    doc.setTextColor(40, 40, 120);
-    doc.text(mesChants.titre, 105, y, { align: "center" });
+  const margin = 20;
+  let y = margin;
 
-    y += 12;
+  // Logo du site en haut
+  const logoUrl = typeof window !== "undefined" ? `${window.location.origin}/logo_praiseApp.png` : "/logo_praiseApp.png";
+  const logoData = await getImageBase64(logoUrl);
+  if (logoData) {
+    const logoW = 20;
+    const logoH = 20;
+    doc.addImage(logoData, "PNG", 105 - logoW / 2, y, logoW, logoH);
+    y += logoH + 6;
+  }
+
+  // En-tête principale
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(20);
+  doc.setTextColor(40, 40, 120);
+  doc.text(mesChants.titre, 105, y, { align: "center" });
+
+  y += 12;
     doc.setDrawColor(40, 40, 120);
     doc.setLineWidth(0.5);
     doc.line(40, y, 170, y);
@@ -47,7 +72,7 @@ import { jsPDF } from "jspdf";
     doc.setFont("helvetica", "bold");
     doc.text("Catégories :", margin, y);
     doc.setFont("helvetica", "normal");
-    doc.text(mesChants.categories.join(", ") || "Pas spécifié", margin + 30, y);
+    doc.text((mesChants.categories || []).join(", ") || "Pas spécifié", margin + 30, y);
     y += 15;
 
     //  Ligne de séparation avant les paroles
@@ -68,7 +93,7 @@ import { jsPDF } from "jspdf";
 
     const lineHeight = 8;
 
-    structure.forEach(({ type, numero, contenu }) => {
+    (structure || []).forEach(({ type, numero, contenu }) => {
       if (y > 270) {
         doc.addPage();
         y = margin;
@@ -77,13 +102,13 @@ import { jsPDF } from "jspdf";
       // Sous-titre du couplet/refrain
       doc.setFont("helvetica", "bold");
       doc.setTextColor(40, 40, 120);
-      doc.text(`${type} ${numero}`, margin, y);
+      doc.text(`${type || ""} ${numero ?? ""}`, margin, y);
       y += 6;
 
       // Paroles
       doc.setFont("helvetica", "normal");
       doc.setTextColor(0, 0, 0);
-      const lines = doc.splitTextToSize(contenu, 170);
+      const lines = doc.splitTextToSize(String(contenu || ""), 170);
       lines.forEach((line) => {
         if (y > 270) {
           doc.addPage();

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Users, Search, Edit, Trash2, Filter, MessageSquare, X } from "lucide-react";
+import { Users, Search, Edit, Trash2, Filter, MessageSquare, X, Music } from "lucide-react";
 import Header from "./Header";
 import { Link, useNavigate } from "react-router-dom";
 import { formatDate } from "../utils/FormatDate";
@@ -18,6 +18,7 @@ function AdminPage() {
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, userId: null, userName: "" });
   const [showFeedbacksModal, setShowFeedbacksModal] = useState(false);
   const [feedbacks, setFeedbacks] = useState([]);
+  const [chantsCount, setChantsCount] = useState(0);
 
   const navigate = useNavigate();
 
@@ -25,6 +26,15 @@ function AdminPage() {
     try {
       const res = await api.get("/api/users");
       setMyUsers(res.data);
+    } catch (err) {
+      console.error("Erreur lors du chargement des utilisateurs", err);
+    }
+  };
+
+  const fetchChantsCount = async () => {
+    try {
+      const res = await api.get("/api/chants");
+      setChantsCount(Array.isArray(res.data) ? res.data.length : 0);
     } catch (err) {
       console.error("Erreur lors du chargement des chants", err);
     }
@@ -46,6 +56,7 @@ function AdminPage() {
     setUser(JSON.parse(storedUser));
     fetchUsers();
     fetchFeedbacks();
+    fetchChantsCount();
   }, [navigate]);
 
   const handleDeleteFeedback = async (id) => {
@@ -98,7 +109,18 @@ function AdminPage() {
         </div>
 
         {/* Statistiques */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+          <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-white/20 shadow-lg">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-blue-100 rounded-lg">
+                <Music className="w-6 h-6 text-blue-700" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Total chants</p>
+                <p className="text-2xl font-bold text-gray-800">{chantsCount}</p>
+              </div>
+            </div>
+          </div>
           <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-white/20 shadow-lg">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-blue-100 rounded-lg">

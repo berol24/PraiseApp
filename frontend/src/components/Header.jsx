@@ -14,7 +14,6 @@ function Header({ user, number_chants, titre }) {
   const [showShareModal, setShowShareModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [currentFontSize, setCurrentFontSize] = useState(() => parseInt(localStorage.getItem("fontSize") || "16"));
-  console.log("number_chants dans header", number_chants);
 
   const handleLogout = () => {
     logout(false); // Ne pas rediriger automatiquement, on le fait manuellement

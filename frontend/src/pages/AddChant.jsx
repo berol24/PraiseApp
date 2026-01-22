@@ -1,7 +1,7 @@
 
 
 import React, { useState } from "react";
-import { X, Plus, AlertCircle } from "lucide-react";
+import { X, Plus, AlertCircle, ChevronUp, ChevronDown } from "lucide-react";
 import api from "../services/api";
 import Modal from "../components/common/Modal";
 import Button from "../components/common/Button";
@@ -37,8 +37,16 @@ export default function AddChant({ onClose, onAdded }) {
   /** Supprimer une partie */
   const removePart = (index) => {
     const updated = form.structure.filter((_, i) => i !== index);
-    // Ne pas réassigner les numéros pour préserver l'ordre de saisie
     setForm({ ...form, structure: updated });
+  };
+
+  /** Déplacer une partie vers le haut ou le bas */
+  const movePart = (index, direction) => {
+    const arr = [...form.structure];
+    const newIndex = direction === "up" ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= arr.length) return;
+    [arr[index], arr[newIndex]] = [arr[newIndex], arr[index]];
+    setForm({ ...form, structure: arr });
   };
 
   /** Modifier une partie */
@@ -127,32 +135,53 @@ export default function AddChant({ onClose, onAdded }) {
               key={index}
               className="flex flex-col sm:flex-row sm:gap-3 mb-4 p-4 bg-gray-50 rounded-xl border border-gray-200"
             >
-              <select
-                className="border-2 border-gray-200 p-2 rounded-xl w-full sm:w-1/4 focus:outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-200 mb-2 sm:mb-0"
-                value={part.type}
-                onChange={(e) => updatePart(index, "type", e.target.value)}
-              >
-                <option value="couplet">Couplet</option>
-                <option value="refrain">Refrain</option>
-                <option value="solo">Solo</option>
-                <option value="ass">Ass</option>
-                <option value="autre">Autre</option>
-              </select>
-
-              <input
-                type="number"
-                min="1"
-                className="border-2 border-gray-200 p-2 rounded-xl w-full sm:w-1/6 focus:outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-200 mb-2 sm:mb-0"
-                value={part.numero}
-                onChange={(e) =>
-                  updatePart(index, "numero", parseInt(e.target.value))
-                }
-              />
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2 sm:mb-0 sm:flex-nowrap">
+                <select
+                  className="border-2 border-gray-200 p-2 rounded-xl w-full sm:w-auto min-w-[120px] focus:outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-200"
+                  value={part.type}
+                  onChange={(e) => updatePart(index, "type", e.target.value)}
+                >
+                  <option value="couplet">Couplet</option>
+                  <option value="refrain">Refrain</option>
+                  <option value="solo">Solo</option>
+                  <option value="ass">Ass</option>
+                  <option value="autre">Autre</option>
+                </select>
+                <input
+                  type="number"
+                  min="1"
+                  className="border-2 border-gray-200 p-2 rounded-xl w-16 focus:outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-200"
+                  value={part.numero}
+                  onChange={(e) =>
+                    updatePart(index, "numero", parseInt(e.target.value) || 1)
+                  }
+                />
+                <div className="flex flex-col rounded-lg overflow-hidden border border-gray-200 bg-white">
+                  <button
+                    type="button"
+                    onClick={() => movePart(index, "up")}
+                    disabled={index === 0}
+                    className="p-1.5 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed text-gray-600"
+                    title="Monter"
+                  >
+                    <ChevronUp className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => movePart(index, "down")}
+                    disabled={index === form.structure.length - 1}
+                    className="p-1.5 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed text-gray-600 border-t border-gray-200"
+                    title="Descendre"
+                  >
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
 
               <textarea
                 placeholder="Contenu"
                 rows="3"
-                className="border-2 border-gray-200 p-2 rounded-xl w-full sm:w-2/3 focus:outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-200 mb-2 sm:mb-0 resize-none"
+                className="border-2 border-gray-200 p-2 rounded-xl flex-1 min-w-0 focus:outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-200 resize-none"
                 value={part.contenu}
                 onChange={(e) => updatePart(index, "contenu", e.target.value)}
               />
@@ -160,7 +189,7 @@ export default function AddChant({ onClose, onAdded }) {
               <button
                 type="button"
                 onClick={() => removePart(index)}
-                className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-xl transition-all shadow-md hover:shadow-lg sm:self-center flex items-center justify-center"
+                className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-xl transition-all shadow-md hover:shadow-lg sm:self-center flex items-center justify-center flex-shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>
