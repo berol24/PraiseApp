@@ -23,6 +23,7 @@ function ShowDetailChant() {
   const [favoris, setFavoris] = useState([]);
   const [similarChants, setSimilarChants] = useState([]);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [shareMode, setShareMode] = useState("lien"); // "lien" | "paroles"
   const structure = mesChants ? mesChants.structure : [];
   const titre = mesChants ? mesChants.titre : "";
   const youtubeId = mesChants?.fichiers?.video_youtube ? getYoutubeId(mesChants.fichiers.video_youtube) : null;
@@ -90,11 +91,15 @@ function ShowDetailChant() {
 
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
   const shareText = `Découvrez le chant "${titre}" sur PraiseApp`;
+  const parolesText = (structure || []).map(({ type, numero, contenu }) => `${type} ${numero}\n${contenu || ""}`).join("\n\n");
+  const parolesFull = `Paroles du chant "${titre}"\n\n${parolesText}\n\n${shareUrl}`;
 
   const handleCopyLink = async () => {
+    const toCopy = shareMode === "paroles" ? parolesFull : shareUrl;
+    const msg = shareMode === "paroles" ? "Paroles copiées dans le presse-papier" : "Lien copié dans le presse-papier";
     try {
-      await navigator.clipboard.writeText(shareUrl);
-      toast("Lien copié dans le presse-papier", "success");
+      await navigator.clipboard.writeText(toCopy);
+      toast(msg, "success");
       setShowShareModal(false);
     } catch {
       toast("Erreur lors de la copie", "error");
@@ -102,29 +107,37 @@ function ShowDetailChant() {
   };
 
   const handleShareToWhatsApp = () => {
-    window.open(`https://wa.me/?text=${encodeURIComponent(shareText + " " + shareUrl)}`, "_blank");
+    const txt = shareMode === "paroles" ? parolesFull : shareText + " " + shareUrl;
+    window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, "_blank");
     setShowShareModal(false);
   };
   const handleShareToSMS = () => {
-    window.open(`sms:?body=${encodeURIComponent(shareText + " " + shareUrl)}`, "_blank");
+    const txt = shareMode === "paroles" ? parolesFull : shareText + " " + shareUrl;
+    window.open(`sms:?body=${encodeURIComponent(txt)}`, "_blank");
     setShowShareModal(false);
   };
   const handleShareToEmail = () => {
-    window.open(`mailto:?subject=${encodeURIComponent("Chant: " + titre)}&body=${encodeURIComponent(shareText + "\n" + shareUrl)}`, "_blank");
+    const subject = shareMode === "paroles" ? "Paroles: " + titre : "Chant: " + titre;
+    const body = shareMode === "paroles" ? parolesFull : shareText + "\n" + shareUrl;
+    window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, "_blank");
     setShowShareModal(false);
   };
   const handleShareToFacebook = () => {
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, "_blank");
+    const q = shareMode === "paroles" ? "&quote=" + encodeURIComponent("Paroles du chant \"" + titre + "\"") : "";
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}${q}`, "_blank");
     setShowShareModal(false);
   };
   const handleShareToTwitter = () => {
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, "_blank");
+    const text = shareMode === "paroles" ? `Paroles du chant "${titre}"` : shareText;
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`, "_blank");
     setShowShareModal(false);
   };
   const handleNativeShare = async () => {
     if (navigator.share) {
       try {
-        await navigator.share({ title: titre, text: shareText, url: shareUrl });
+        const title = shareMode === "paroles" ? "Paroles - " + titre : titre;
+        const text = shareMode === "paroles" ? parolesFull : shareText;
+        await navigator.share({ title, text, url: shareUrl });
         setShowShareModal(false);
       } catch (err) {
         if (err.name !== "AbortError") toast("Erreur lors du partage", "error");
@@ -298,11 +311,18 @@ function ShowDetailChant() {
                 Télécharger les paroles en PDF
               </button>
               <button
-                onClick={() => setShowShareModal(true)}
+                onClick={() => { setShareMode("lien"); setShowShareModal(true); }}
                 className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
               >
                 <Share2 className="w-4 h-4" />
-                Partager ce chant
+                Partager le lien
+              </button>
+              <button
+                onClick={() => { setShareMode("paroles"); setShowShareModal(true); }}
+                className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+              >
+                <Share2 className="w-4 h-4" />
+                Partager les paroles
               </button>
             </div>
           </div>
@@ -357,12 +377,12 @@ function ShowDetailChant() {
         <Modal
           isOpen={showShareModal}
           onClose={() => setShowShareModal(false)}
-          title="Partager ce chant"
+          title={shareMode === "paroles" ? "Partager les paroles" : "Partager le lien"}
           size="md"
         >
           <div className="space-y-4 sm:space-y-6 pb-2">
-            <p className="text-sm sm:text-base text-gray-600 text-center mb-4 sm:mb-6 px-2">
-              Choisissez une application pour partager ce chant
+            <p className="text-sm sm:text-base text-gray-600 text-center mb-4 px-2">
+              {shareMode === "paroles" ? "Choisissez une application pour partager les paroles" : "Choisissez une application pour partager le lien"}
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
               <button
@@ -420,20 +440,26 @@ function ShowDetailChant() {
                 <span className="text-xs sm:text-sm font-semibold text-gray-800">Copier</span>
               </button>
             </div>
-            {navigator.share ? (
-              <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200">
-                <p className="text-xs sm:text-sm text-gray-500 text-center mb-3 sm:mb-4 px-2">
-                  Ou utilisez le partage natif pour toutes les applications
+            <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200">
+              {navigator.share ? (
+                <>
+                  <p className="text-xs sm:text-sm text-gray-500 text-center mb-3 sm:mb-4 px-2">
+                    💡 Utilisez le partage natif pour voir toutes les applications installées sur votre appareil
+                  </p>
+                  <button
+                    onClick={handleNativeShare}
+                    className="w-full flex items-center justify-center gap-2 sm:gap-3 p-3 sm:p-4 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white text-sm sm:text-base font-semibold rounded-xl transition-all shadow-lg hover:shadow-xl"
+                  >
+                    <Share2 className="w-5 h-5 flex-shrink-0" />
+                    Partager via toutes les applications
+                  </button>
+                </>
+              ) : (
+                <p className="text-xs sm:text-sm text-gray-500 text-center px-2 leading-relaxed">
+                  ℹ️ Partager via toutes les applications (partage natif) n'est pas disponible sur cet appareil ou navigateur. Utilisez les options ci-dessus (WhatsApp, SMS, Email, etc.).
                 </p>
-                <button
-                  onClick={handleNativeShare}
-                  className="w-full flex items-center justify-center gap-2 sm:gap-3 p-3 sm:p-4 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-white text-sm sm:text-base font-semibold rounded-xl transition-all shadow-lg hover:shadow-xl"
-                >
-                  <Share2 className="w-5 h-5 flex-shrink-0" />
-                  Partager via toutes les applications
-                </button>
-              </div>
-            ) : null}
+              )}
+            </div>
           </div>
         </Modal>
         </div>

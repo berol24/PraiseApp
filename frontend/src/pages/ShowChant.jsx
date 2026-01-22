@@ -374,26 +374,11 @@ export default function ShowChant() {
                   {isNew && (
                     <span className="absolute top-3 left-3 px-2 py-0.5 bg-emerald-500 text-white text-xs font-bold rounded-full">Nouveau</span>
                   )}
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex-1">
-                      <h3 className="font-bold text-xl text-gray-800 mb-2 group-hover:text-blue-700 transition-colors line-clamp-2">
-                        {c.titre}
-                      </h3>
-                      <p className="text-gray-600 italic text-sm mb-2">
-                        <span className="font-semibold">Auteur:</span> {c.auteur || "Inconnu"}
-                      </p>
-                      {c.langue && (
-                        <span className="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-lg font-medium">
-                          {c.langue}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* ⭐ Bouton Favori */}
+                  <div className="relative mb-4">
                     {user && (
                       <button
                         onClick={(e) => handleFavori(c._id, e)}
-                        className={`text-3xl transition-all transform hover:scale-110 ${
+                        className={`absolute top-0 right-0 text-3xl transition-all transform hover:scale-110 ${
                           isFavori(c._id)
                             ? "text-amber-500 hover:text-amber-600"
                             : "text-gray-300 hover:text-amber-400"
@@ -407,6 +392,19 @@ export default function ShowChant() {
                         {isFavori(c._id) ? "★" : "☆"}
                       </button>
                     )}
+                    <div className={`text-center flex flex-col items-center ${user ? "pr-10" : ""}`}>
+                      <h3 className="font-bold text-xl text-gray-800 mb-2 group-hover:text-blue-700 transition-colors line-clamp-2 w-full">
+                        {c.titre}
+                      </h3>
+                      <p className="text-gray-600 italic text-sm mb-2">
+                        <span className="font-semibold">Auteur:</span> {c.auteur || "Inconnu"}
+                      </p>
+                      {c.langue && (
+                        <span className="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-lg font-medium">
+                          {c.langue}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex gap-2 mt-4 pt-4 border-t border-gray-200">

@@ -669,8 +669,8 @@ Téléchargez maintenant : ${shareUrl}`;
                     {isNew && (
                       <span className="absolute top-3 right-3 px-2 py-0.5 bg-emerald-500 text-white text-xs font-bold rounded-full">Nouveau</span>
                     )}
-                    <div className="flex-1">
-                      <h3 className="font-bold text-xl text-gray-800 mb-2 group-hover:text-blue-700 transition-colors line-clamp-2 pr-16">
+                    <div className="flex-1 text-center flex flex-col justify-center">
+                      <h3 className="font-bold text-xl text-gray-800 mb-2 group-hover:text-blue-700 transition-colors line-clamp-2">
                         {c.titre}
                       </h3>
                       <p className="text-gray-600 italic text-sm">

@@ -228,9 +228,18 @@ export default function Favoris() {
               {filteredChants.map((c, index) => (
                 <Link to={`/showChants/${c._id}`} key={c._id || index} className="block group">
                   <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-2xl p-6 flex flex-col justify-between cursor-pointer hover:shadow-2xl transition-all duration-300 border border-white/20 hover:-translate-y-2 h-full">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex-1">
-                        <h3 className="font-bold text-xl text-gray-800 mb-2 group-hover:text-blue-700 transition-colors line-clamp-2">
+                    <div className="relative mb-4">
+                      {user && (
+                        <button
+                          onClick={(e) => handleFavori(c._id, e)}
+                          className="absolute top-0 right-0 text-3xl transition-all transform hover:scale-110 text-amber-500 hover:text-amber-600"
+                          title="Retirer des favoris"
+                        >
+                          ★
+                        </button>
+                      )}
+                      <div className={`text-center flex flex-col items-center ${user ? "pr-10" : ""}`}>
+                        <h3 className="font-bold text-xl text-gray-800 mb-2 group-hover:text-blue-700 transition-colors line-clamp-2 w-full">
                           {c.titre}
                         </h3>
                         <p className="text-gray-600 italic text-sm mb-2">
@@ -242,15 +251,6 @@ export default function Favoris() {
                           </span>
                         )}
                       </div>
-                      {user && (
-                        <button
-                          onClick={(e) => handleFavori(c._id, e)}
-                          className="text-3xl transition-all transform hover:scale-110 text-amber-500 hover:text-amber-600"
-                          title="Retirer des favoris"
-                        >
-                          ★
-                        </button>
-                      )}
                     </div>
                   </div>
                 </Link>
