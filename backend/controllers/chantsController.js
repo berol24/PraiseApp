@@ -123,3 +123,83 @@ export async function getFavoris(req, res) {
     res.status(500).json({ message: "Erreur serveur", error: error?.message });
   }
 }
+
+export async function getFilters(req, res) {
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({ 
+        message: "Service temporairement indisponible. Reconnexion à la base de données en cours..." 
+      });
+    }
+    
+    // Récupérer tous les chants pour extraire les valeurs uniques
+    const chants = await Chant.find({}, "categories langue rythme");
+    
+    // Extraire les catégories uniques (tableau de tableaux)
+    const allCategories = chants
+      .flatMap(chant => chant.categories || [])
+      .filter(cat => cat && cat.trim() !== "")
+      .map(cat => cat.trim());
+    const uniqueCategories = [...new Set(allCategories)].sort();
+    
+    // Extraire les langues uniques
+    const allLangues = chants
+      .map(chant => chant.langue)
+      .filter(langue => langue && langue.trim() !== "")
+      .map(langue => langue.trim());
+    const uniqueLangues = [...new Set(allLangues)].sort();
+    
+    // Extraire les rythmes uniques
+    const allRythmes = chants
+      .map(chant => chant.rythme)
+      .filter(rythme => rythme && rythme.trim() !== "")
+      .map(rythme => rythme.trim());
+    const uniqueRythmes = [...new Set(allRythmes)].sort();
+    
+    res.json({
+      categories: uniqueCategories,
+      langues: uniqueLangues,
+      rythmes: uniqueRythmes
+    });
+  } catch (err) {
+    console.error("Erreur getFilters:", err);
+    res.status(500).json({ 
+      message: err.message || "Erreur lors de la récupération des filtres" 
+    });
+  }
+}
+
+export async function getSimilarChants(req, res) {
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({ message: "Service temporairement indisponible." });
+    }
+    const chant = await Chant.findById(req.params.id).lean();
+    if (!chant) return res.status(404).json({ message: "Chant introuvable" });
+
+    const or = [];
+    if (chant.auteur && chant.auteur.trim()) {
+      or.push({ auteur: new RegExp(chant.auteur.trim(), "i") });
+    }
+    if (chant.categories && chant.categories.length > 0) {
+      or.push({ categories: { $in: chant.categories } });
+    }
+    if (chant.langue && chant.langue.trim()) {
+      or.push({ langue: new RegExp(chant.langue.trim(), "i") });
+    }
+    if (or.length === 0) {
+      return res.json([]);
+    }
+
+    const similar = await Chant.find({
+      _id: { $ne: chant._id },
+      $or: or
+    })
+      .limit(6)
+      .populate("ajoute_par", "nom");
+    res.json(similar);
+  } catch (err) {
+    console.error("Erreur getSimilarChants:", err);
+    res.status(500).json({ message: err.message || "Erreur lors de la récupération des chants similaires" });
+  }
+}
