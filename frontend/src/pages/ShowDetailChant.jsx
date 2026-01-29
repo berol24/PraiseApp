@@ -1,12 +1,72 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
-import { FileText, Music, Video, Download, Share2, File, Star, Copy, MessageSquare, Mail, Users, Hash, Smartphone } from "lucide-react";
+import { FileText, Music, Video, Download, Share2, File, Star, Copy, MessageSquare, Mail, Users, Hash, Smartphone, Languages } from "lucide-react";
 import { formatDate } from "../utils/FormatDate";
 import { handleDownloadPDF } from "../utils/HandleDownloadPDF";
 import api from "../services/api";
 import Header from "../components/Header";
 import Modal from "../components/common/Modal";
 import { toast } from "../services/toast";
+
+// Liste des langues disponibles pour la traduction avec leurs codes ISO
+const TRANSLATION_LANGUAGES = [
+  { code: "en", name: "Anglais" },
+  { code: "es", name: "Espagnol" },
+  { code: "de", name: "Allemand" },
+  { code: "it", name: "Italien" },
+  { code: "pt", name: "Portugais" },
+  { code: "ar", name: "Arabe" },
+  { code: "zh", name: "Chinois" },
+  { code: "ja", name: "Japonais" },
+  { code: "ko", name: "Coréen" },
+  { code: "ru", name: "Russe" },
+  { code: "hi", name: "Hindi" },
+  { code: "nl", name: "Néerlandais" },
+  { code: "el", name: "Grec" },
+  { code: "tr", name: "Turc" },
+  { code: "pl", name: "Polonais" },
+  { code: "sv", name: "Suédois" },
+  { code: "no", name: "Norvégien" },
+  { code: "da", name: "Danois" },
+  { code: "fi", name: "Finnois" },
+  { code: "cs", name: "Tchèque" },
+  { code: "ro", name: "Roumain" },
+  { code: "hu", name: "Hongrois" },
+  { code: "bg", name: "Bulgare" },
+  { code: "hr", name: "Croate" },
+  { code: "sr", name: "Serbe" },
+  { code: "sk", name: "Slovaque" },
+  { code: "sl", name: "Slovène" },
+  { code: "uk", name: "Ukrainien" },
+  { code: "vi", name: "Vietnamien" },
+  { code: "th", name: "Thaï" },
+  { code: "id", name: "Indonésien" },
+  { code: "ms", name: "Malais" },
+  { code: "sw", name: "Swahili" },
+  { code: "af", name: "Afrikaans" },
+  { code: "he", name: "Hébreu" },
+  { code: "fa", name: "Persan" },
+  { code: "ur", name: "Ourdou" },
+  { code: "bn", name: "Bengali" },
+  { code: "ta", name: "Tamoul" },
+  { code: "te", name: "Telugu" },
+  { code: "mr", name: "Marathi" },
+  { code: "gu", name: "Gujarati" },
+  { code: "pa", name: "Punjabi" },
+  { code: "kn", name: "Kannada" },
+  { code: "ml", name: "Malayalam" },
+  { code: "ne", name: "Népalais" },
+  { code: "si", name: "Sinhala" },
+  { code: "my", name: "Birman" },
+  { code: "km", name: "Khmer" },
+  { code: "lo", name: "Lao" },
+  { code: "am", name: "Amharique" },
+  { code: "ha", name: "Hausa" },
+  { code: "yo", name: "Yoruba" },
+  { code: "ig", name: "Igbo" },
+  { code: "zu", name: "Zulu" },
+  { code: "xh", name: "Xhosa" },
+];
 
 function getYoutubeId(url) {
   if (!url) return null;
@@ -24,6 +84,10 @@ function ShowDetailChant() {
   const [similarChants, setSimilarChants] = useState([]);
   const [showShareModal, setShowShareModal] = useState(false);
   const [shareMode, setShareMode] = useState("lien"); // "lien" | "paroles"
+  const [showTranslateModal, setShowTranslateModal] = useState(false);
+  const [translations, setTranslations] = useState({}); // { [partId]: { [langCode]: translatedText } }
+  const [translating, setTranslating] = useState(false);
+  const [selectedLangForTranslation, setSelectedLangForTranslation] = useState("");
   const structure = mesChants ? mesChants.structure : [];
   const titre = mesChants ? mesChants.titre : "";
   const youtubeId = mesChants?.fichiers?.video_youtube ? getYoutubeId(mesChants.fichiers.video_youtube) : null;
@@ -143,6 +207,60 @@ function ShowDetailChant() {
         if (err.name !== "AbortError") toast("Erreur lors du partage", "error");
       }
     }
+  };
+
+  const handleTranslate = async (langCode) => {
+    if (!langCode) {
+      toast("Veuillez sélectionner une langue", "error");
+      return;
+    }
+
+    setTranslating(true);
+    try {
+      const newTranslations = { ...translations };
+      
+      // Traduire chaque partie de la structure
+      for (const part of structure) {
+        const partId = part._id || `part-${part.type}-${part.numero}`;
+        if (!newTranslations[partId]) {
+          newTranslations[partId] = {};
+        }
+        
+        // Si la traduction n'existe pas encore pour cette langue
+        if (!newTranslations[partId][langCode]) {
+          const textToTranslate = part.contenu || "";
+          if (textToTranslate.trim()) {
+            const response = await api.post("/api/chants/translate", {
+              text: textToTranslate,
+              targetLang: langCode
+            });
+            newTranslations[partId][langCode] = response.data.translatedText;
+          }
+        }
+      }
+      
+      setTranslations(newTranslations);
+      setShowTranslateModal(false);
+      setSelectedLangForTranslation(langCode);
+      toast("Traduction effectuée avec succès", "success");
+    } catch (err) {
+      console.error("Erreur traduction:", err);
+      toast("Erreur lors de la traduction", "error");
+    } finally {
+      setTranslating(false);
+    }
+  };
+
+  const getTranslatedText = (part, langCode) => {
+    if (!langCode) return null;
+    const partId = part._id || `part-${part.type}-${part.numero}`;
+    return translations[partId]?.[langCode] || null;
+  };
+
+  const clearTranslation = () => {
+    setTranslations({});
+    setSelectedLangForTranslation("");
+    toast("Traduction effacée", "success");
   };
 
   if (loading) {
@@ -329,24 +447,56 @@ function ShowDetailChant() {
         </div>
 
         <div className="mt-6 sm:mt-8 p-4 sm:p-6 md:p-8 bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl shadow-inner border border-gray-200 relative">
-          <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-800 via-blue-700 to-orange-500 bg-clip-text text-transparent flex items-center gap-2 mb-4 sm:mb-6">
-            <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-blue-700" />
-            Paroles
-          </h2>
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-800 via-blue-700 to-orange-500 bg-clip-text text-transparent flex items-center gap-2">
+              <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-blue-700" />
+              Paroles
+            </h2>
+            <div className="flex items-center gap-2">
+              {selectedLangForTranslation && (
+                <button
+                  onClick={clearTranslation}
+                  className="px-3 py-1.5 text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-all"
+                >
+                  Afficher original
+                </button>
+              )}
+              <button
+                onClick={() => setShowTranslateModal(true)}
+                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold rounded-xl transition-all shadow-md hover:shadow-lg flex items-center gap-2"
+              >
+                <Languages className="w-4 h-4" />
+                Traduire
+              </button>
+            </div>
+          </div>
 
           <div className="space-y-4 sm:space-y-6" id="paroles-content">
             {structure.map((part, index) => {
               const { _id, type, numero, contenu } = part;
+              const translatedText = selectedLangForTranslation ? getTranslatedText(part, selectedLangForTranslation) : null;
+              const displayText = translatedText || contenu;
+              const langName = selectedLangForTranslation 
+                ? TRANSLATION_LANGUAGES.find(l => l.code === selectedLangForTranslation)?.name 
+                : null;
+              
               return (
                 <div key={_id || index} className="bg-white/80 backdrop-blur-sm rounded-xl p-4 sm:p-5 border-l-4 border-blue-700 shadow-md hover:shadow-lg transition-all">
-                  <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-800 via-blue-700 to-orange-500 bg-clip-text text-transparent mb-2 sm:mb-3 capitalize">
-                    {type} {numero}
-                  </h3>
+                  <div className="flex items-center justify-between mb-2 sm:mb-3">
+                    <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-800 via-blue-700 to-orange-500 bg-clip-text text-transparent capitalize">
+                      {type} {numero}
+                    </h3>
+                    {translatedText && (
+                      <span className="text-xs sm:text-sm text-purple-600 font-semibold bg-purple-100 px-2 py-1 rounded">
+                        {langName}
+                      </span>
+                    )}
+                  </div>
                   <p
                     className="whitespace-pre-line text-gray-700 leading-relaxed break-words"
                     style={{ fontSize: `${fontSize}px` }}
                   >
-                    {contenu}
+                    {displayText}
                   </p>
                 </div>
               );
@@ -372,6 +522,38 @@ function ShowDetailChant() {
             </div>
           </div>
         )}
+
+        {/* Modal traduction */}
+        <Modal
+          isOpen={showTranslateModal}
+          onClose={() => setShowTranslateModal(false)}
+          title="Traduire les paroles"
+          size="md"
+        >
+          <div className="space-y-4 pb-2">
+            <p className="text-sm text-gray-600 text-center mb-4">
+              Sélectionnez la langue dans laquelle vous souhaitez traduire les paroles
+            </p>
+            <div className="max-h-96 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {TRANSLATION_LANGUAGES.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => handleTranslate(lang.code)}
+                  disabled={translating}
+                  className="p-3 bg-gradient-to-br from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 rounded-lg border border-purple-200 transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium text-gray-800"
+                >
+                  {lang.name}
+                </button>
+              ))}
+            </div>
+            {translating && (
+              <div className="text-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-4 border-b-4 border-purple-600 mx-auto mb-2"></div>
+                <p className="text-sm text-gray-600">Traduction en cours...</p>
+              </div>
+            )}
+          </div>
+        </Modal>
 
         {/* Modal partage du chant */}
         <Modal
