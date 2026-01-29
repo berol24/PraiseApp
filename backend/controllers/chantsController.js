@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { Chant, User } from "../models.js";
+import { translate } from "@vitalets/google-translate-api";
 
 export async function getChants(req, res) {
   try {
@@ -177,29 +178,65 @@ export async function getSimilarChants(req, res) {
     const chant = await Chant.findById(req.params.id).lean();
     if (!chant) return res.status(404).json({ message: "Chant introuvable" });
 
-    const or = [];
-    if (chant.auteur && chant.auteur.trim()) {
-      or.push({ auteur: new RegExp(chant.auteur.trim(), "i") });
-    }
-    if (chant.categories && chant.categories.length > 0) {
-      or.push({ categories: { $in: chant.categories } });
-    }
-    if (chant.langue && chant.langue.trim()) {
-      or.push({ langue: new RegExp(chant.langue.trim(), "i") });
-    }
-    if (or.length === 0) {
-      return res.json([]);
+    let query = { _id: { $ne: chant._id } };
+
+    // Priorité 1: Filtrer par rythme si le chant a un rythme
+    if (chant.rythme && chant.rythme.trim()) {
+      query.rythme = new RegExp(chant.rythme.trim(), "i");
+    } else {
+      // Priorité 2: Si pas de rythme, filtrer par catégories
+      if (chant.categories && chant.categories.length > 0) {
+        query.categories = { $in: chant.categories };
+      } else {
+        // Si ni rythme ni catégories, retourner un tableau vide
+        return res.json([]);
+      }
     }
 
-    const similar = await Chant.find({
-      _id: { $ne: chant._id },
-      $or: or
-    })
+    const similar = await Chant.find(query)
       .limit(6)
       .populate("ajoute_par", "nom");
     res.json(similar);
   } catch (err) {
     console.error("Erreur getSimilarChants:", err);
     res.status(500).json({ message: err.message || "Erreur lors de la récupération des chants similaires" });
+  }
+}
+
+export async function translateLyrics(req, res) {
+  try {
+    const { text, targetLang } = req.body;
+    
+    if (!text || !targetLang) {
+      return res.status(400).json({ message: "Le texte et la langue cible sont requis" });
+    }
+
+    // Traduire le texte
+    const result = await translate(text, { to: targetLang });
+    
+    // Extraire le texte traduit
+    const translatedText = result.text || "";
+    
+    if (!translatedText) {
+      console.error("Structure de réponse inattendue:", result);
+      return res.status(500).json({ 
+        message: "La traduction n'a pas retourné de texte valide" 
+      });
+    }
+    
+    // Extraire la langue source depuis raw.src
+    const sourceLang = result.raw?.src || "auto";
+    
+    res.json({ 
+      originalText: text,
+      translatedText: translatedText,
+      sourceLang: sourceLang,
+      targetLang: targetLang
+    });
+  } catch (err) {
+    console.error("Erreur translateLyrics:", err);
+    res.status(500).json({ 
+      message: err.message || "Erreur lors de la traduction" 
+    });
   }
 }

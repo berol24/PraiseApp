@@ -9,6 +9,7 @@ import {
   getFavoris,
   getFilters,
   getSimilarChants,
+  translateLyrics,
 } from "../controllers/chantsController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 
@@ -17,6 +18,7 @@ const router = express.Router();
 // Routes spécifiques doivent être déclarées AVANT les routes avec paramètres
 router.get("/", getChants);
 router.get("/filters", getFilters);
+router.post("/translate", translateLyrics);
 // Favoris routes must be declared before the param route to avoid 'favoris' being treated as an ID
 router.get("/favoris", authMiddleware(["client", "manager", "admin"]), getFavoris);
 router.post("/favoris/:chantId", authMiddleware(["client", "manager", "admin"]), toggleFavoris);
